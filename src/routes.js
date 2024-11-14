@@ -1,11 +1,11 @@
 import { ROUTER } from "./utils/router";
-import Dashboard from "./layouts/dashboard";
-import Profile from "./layouts/profile";
-import Test from "./layouts/test";
-import Assignment from "./layouts/assignment";
-import Learn from "./layouts/learn";
-import DemoLearn from "./layouts/learn/demoLearn";
-import DataLibrary from "./layouts/datalibrary";
+import Dashboard from "./pages/dashboard";
+import Profile from "./pages/profile";
+import Test from "./pages/test";
+import Assignment from "./pages/assignment";
+import Learn from "./pages/learn";
+import DemoLearn from "./pages/learn/demoLearn";
+import DataLibrary from "./pages/datalibrary";
 import { Route, Routes } from "react-router-dom";
 
 const renderUserRouter = () => {

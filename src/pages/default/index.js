@@ -1,10 +1,10 @@
 import React from 'react'
-import MasterLayout from '../../examples/MasterLayout/masterlayout'
+import MasterLayout from '../../layouts/MasterLayout/masterlayout'
 
 const Dashboard = () => {
     return (
         <>
-            
+
         </>
     )
 }

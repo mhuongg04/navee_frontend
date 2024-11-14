@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { List, Skeleton, Avatar, Card } from 'antd';
-import MasterLayout from '../../examples/MasterLayout/masterlayout';
+import MasterLayout from '../../layouts/MasterLayout/masterlayout';
 import { getAllTopics, getTopicByLevel } from './api/getAllTopics.api';
 import traffic1 from '../../assets/images/traffic1.png';
 import weather from '../../assets/images/weather.png';
