@@ -1,0 +1,22 @@
+/* For the input field */
+.custom-search-input {
+    border-color: #093673;
+    color: #093673;
+}
+
+.custom-search-input:focus {
+    border-color: #093673;
+    box-shadow: 0 0 0 0.25rem rgba(9, 54, 115, 0.25);
+}
+
+/* For the button */
+.custom-search-btn {
+    border-color: #093673;
+    color: #093673;
+}
+
+.custom-search-btn:hover {
+    background-color: #093673;
+    color: white;
+    border-color: #093673;
+}
