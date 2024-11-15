@@ -7,6 +7,8 @@ import Learn from "./pages/learn";
 import DemoLearn from "./pages/learn/demoLearn";
 import DataLibrary from "./pages/datalibrary";
 import { Route, Routes } from "react-router-dom";
+import Lessons from "./pages/learn/components/lesson";
+import Game from "./pages/learn/components/minigame";
 
 const renderUserRouter = () => {
     const userRouters = [
@@ -40,8 +42,17 @@ const renderUserRouter = () => {
         },
         {
             path: '/learn/1',
+            component: <Lessons />
+        },
+        {
+            path: '/lesson/1',
             component: <DemoLearn />
+        },
+        {
+            path: '/game/1',
+            component: <Game />
         }
+
 
 
     ]

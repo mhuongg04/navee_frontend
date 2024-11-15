@@ -6,7 +6,9 @@ import traffic1 from '../../assets/images/traffic1.png';
 import weather from '../../assets/images/weather.png';
 import hobby from '../../assets/images/hobby.png';
 import gmorning from '../../assets/images/gmorning.png';
+import logo from '../../assets/images/logo/NAVEE_logo.png';
 import { useNavigate } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 // const { Container } = require('react-bootstrap');
 // const NavDropdown = require('react-bootstrap/NavDropdown');
 
@@ -54,29 +56,63 @@ const Learn = () => {
   const data = [
     {
       id: 1,
-      tittle: 'lesson-1-demo',
-      topicName: 'Lesson 1: Traffic Jam',
+      tittle: 'topic-1-demo',
+      topicName: 'Traffic Jam',
       image: traffic1
     },
     {
       id: 2,
-      tittle: 'lesson-2-demo',
-      topicName: 'Lesson 2: Weather',
+      tittle: 'topic-2-demo',
+      topicName: 'Weather',
       image: weather
     },
     {
       id: 3,
-      tittle: 'lesson-3-demo',
-      topicName: 'Lesson 3: Hobby',
+      tittle: 'topic-3-demo',
+      topicName: 'Hobby',
       image: hobby
     },
     {
       id: 4,
-      tittle: 'lesson-4-demo',
-      topicName: 'Lesson 4: Good morning',
+      tittle: 'topic-4-demo',
+      topicName: 'Greetings',
       image: gmorning
     },
+    {
+      id: 5,
+      tittle: 'topic-5-demo',
+      topicName: 'Jobs',
+      image: logo
+    },
+    {
+      id: 6,
+      tittle: 'topic-6-demo',
+      topicName: 'Culture',
+      image: logo
+    },
+    {
+      id: 7,
+      tittle: 'topic-7-demo',
+      topicName: 'Animal',
+      image: logo
+    },
+    {
+      id: 8,
+      tittle: 'topic-8-demo',
+      topicName: 'Numbers',
+      image: logo
+    },
+    {
+      id: 9,
+      tittle: 'topic-9-demo',
+      topicName: 'Country',
+      image: logo
+    },
   ]
+
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1024 });
+
   return (
     <MasterLayout>
       <h1>TOPICS</h1>
@@ -132,7 +168,7 @@ const Learn = () => {
       /> */}
       <List
         className="custom-scrollbar mt-4 max-h-[450px] overflow-y-auto pb-4"
-        grid={{ gutter: 16, column: 5 }}
+        grid={{ gutter: 16, column: isMobile ? 1 : isTablet ? 2 : 5 }}
         dataSource={data}
         renderItem={(item) => (
           <List.Item>
@@ -141,7 +177,7 @@ const Learn = () => {
                 <img
                   alt={item.title}
                   src={item.image}
-                  style={{ height: '180px' }}
+                  style={{ height: '13rem' }}
                 />
               }
               onClick={() => navigate(`/learn/${item.id}`)}

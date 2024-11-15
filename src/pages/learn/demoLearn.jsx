@@ -4,6 +4,7 @@ import traffic1 from '../../assets/images/traffic1.png';
 import traffic from '../../assets/mp3/topic/traffic-mp3.mp3';
 import trafficpractice from '../../assets/mp3/topic/traffic1-practice.mp3';
 import { useNavigate } from 'react-router-dom'
+import { FaArrowLeft } from 'react-icons/fa';
 
 const DemoLearn = () => {
     const audioRef = useRef(null);
@@ -120,25 +121,34 @@ const DemoLearn = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (audioRef.current) {
-                audioRef.current.load()
-                audioRef.current.play();
+                audioRef.current.load();
+                audioRef.current.addEventListener('canplaythrough', () => {
+                    audioRef.current.play();
+                });
             }
-        }, 1000);
+        }, 500);
 
+        return () => {
+            clearTimeout(timer);
+        };
     }, [currentIndex]);
 
     return (
         <>
-            <div className='p-3 text-start' onClick={() => navigate('/learn')} style={{ cursor: 'pointer' }}>
-
-                Return to Dashboard
+            <div
+                className="d-flex align-items-center p-3 text-start"
+                onClick={() => navigate('/learn/1')}
+                style={{ cursor: 'pointer' }}
+            >
+                <FaArrowLeft className="mr-2" />
+                <span className='px-3 fs-5'>Return to Dashboard</span>
             </div>
             <h2 className='mt-1'>Lesson 1: Traffic jam</h2>
             <div className="container border rounded border-info border-2 flex-fill mt-3" style={{ padding: '20px' }}>
                 <h3 className='text-start'>{currentLesson.part}</h3>
-                <Row gutter={16} align="stretch">
-                    {/* Cột 1: Audio */}
-                    <Col span={11} className="d-flex w-full">
+                <Row gutter={[16, 16]} align="top">
+                    {/* Column 1: Audio */}
+                    <Col xs={24} sm={24} md={11} className="d-flex w-full">
                         <Card title="Audio Player" bordered={false}>
                             <div>
                                 <audio ref={audioRef} controls>
@@ -150,14 +160,13 @@ const DemoLearn = () => {
                                 <img
                                     alt='traffic-jam'
                                     src={traffic1}
-                                    style={{ height: '300px' }}
+                                    style={{ height: '300px', width: '100%', objectFit: 'cover' }}
                                 />
                             </div>
-
                         </Card>
                     </Col>
 
-                    <Col span={2}>
+                    <Col xs={0} sm={0} md={2}>
                         <Divider
                             type="vertical"
                             style={{
@@ -167,8 +176,7 @@ const DemoLearn = () => {
                             }} />
                     </Col>
 
-                    {/* Cột 2: Script */}
-                    <Col span={11} className="d-flex w-full">
+                    <Col xs={24} sm={24} md={11} className="d-flex w-full">
                         <Card title="Story" bordered={false}>
                             <h5 className="text-start">English Term</h5>
                             <p className="text-start">
@@ -182,15 +190,32 @@ const DemoLearn = () => {
                     </Col>
                 </Row>
             </div>
+
             <div className="text-center mt-2">
-                <Button onClick={handlePrevious} disabled={currentIndex === 0}>
+                <Button
+                    onClick={handlePrevious}
+                    disabled={currentIndex === 0}
+                    className="px-5 py-4 btn-lg btn-primary"
+                >
                     Previous
                 </Button>
-
-                <Button onClick={handleNext} disabled={currentIndex === lessons.length - 1} className="ml-4">
+                <span className="px-3"></span>
+                <Button
+                    onClick={handleNext}
+                    disabled={currentIndex === lessons.length - 1}
+                    className="px-5 py-4 btn-lg btn-success"
+                >
                     Next
                 </Button>
+                <span className="px-3"></span>
+                <Button
+                    onClick={() => navigate('/game/1')}
+                    className="px-5 py-4 btn-lg btn-warning"
+                >
+                    Practice
+                </Button>
             </div>
+
         </>
     )
 }
