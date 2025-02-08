@@ -1,64 +1,79 @@
-//import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
-//import Form from 'react-bootstrap/Form';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import './header.css';
+import React from 'react';
+import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
+import { FaUser } from 'react-icons/fa';
+import { useAuth } from '../../utils/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 import NAVEE_logo from '../../assets/images/logo/NAVEE_logo.png';
-import { FaUser, FaBell } from 'react-icons/fa';
 
 const Header = () => {
+    const navigate = useNavigate();
+    const { logoutAuth } = useAuth();
+
+    //Xử lý đăng xuất
+    const handleLogout = () => {
+        logoutAuth();
+        navigate('/');
+    };
+
     return (
-        <Navbar expand="lg" className="bg-body-tertiary">
+        <Navbar bg="light" expand="lg" className="shadow-sm">
             <Container fluid>
-                <Navbar.Brand href="/">
+                {/* Logo */}
+                <Navbar.Brand as={Link} to="/">
                     <img
                         src={NAVEE_logo}
                         alt="NAVEE Logo"
-                        style={{ width: '70px', margin: '0px 5px' }} />
+                        className="img-fluid"
+                        style={{ width: '70px', margin: '0 5px' }}
+                    />
                 </Navbar.Brand>
-                <Navbar.Toggle aria-controls="navbarScroll" />
-                <Navbar.Collapse id="navbarScroll">
-                    <Nav
-                        className="me-auto my-2 my-lg-0 navbar-custom"
-                        style={{ maxHeight: '100px' }}
-                        navbarScroll
-                    >
-                        <Nav.Link href="/" className="fs-5">Home</Nav.Link>
-                        <Nav.Link href="/learn" className="fs-5">Learn</Nav.Link>
-                        <Nav.Link href="/assignment" className="fs-5">Assignment</Nav.Link>
-                        <Nav.Link href="/test" className="fs-5">Test</Nav.Link>
-                    </Nav>
-                    {/* <Form className="d-flex">
-                        <Form.Control
-                            type="search"
-                            placeholder="Search"
-                            className="me-2 custom-search-input"
-                            aria-label="Search"
-                        />
-                        <Button className="custom-search-btn" variant="outline-success">Search</Button>
-                    </Form> */}
-                </Navbar.Collapse>
-                {/* <NavDropdown
-                    title={<FaBell size={24} />}
-                    id="navbarScrollingDropdown"
-                    align="end"
-                    className='mx-4'
-                    style={{ color: '#093673' }}>
-                    <NavDropdown.Item href="#action1">New comment on your post</NavDropdown.Item>
-                    <NavDropdown.Item href="#action2">New like on your post</NavDropdown.Item>
-                    <NavDropdown.Item href="#action3">New friend request</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item href="#action4">See all notifications</NavDropdown.Item>
-                </NavDropdown>
-                <a href="/profile" className='me-4'>
-                    <FaUser size={25} style={{ color: '#093673' }} />
-                </a> */}
 
+                {/* Toggle Button for Responsive */}
+                <Navbar.Toggle aria-controls="navbar-nav" />
+
+                {/* Menu Items */}
+                <Navbar.Collapse id="navbar-nav">
+                    <Nav className="me-auto">
+                        <Nav.Link as={Link} to="/" className="fs-5 text-dark">
+                            Trang chủ
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/dashboard" className="fs-5 text-dark">
+                            Bảng tin
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/learn" className="fs-5 text-dark">
+                            Học tập
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/dictionary" className="fs-5 text-dark">
+                            Từ điển
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/test" className="fs-5 text-dark">
+                            Kiểm tra
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/management" className="fs-5 text-dark">
+                            Quản lý
+                        </Nav.Link>
+                    </Nav>
+
+                    {/* Dropdown for User */}
+                    <Nav>
+                        <NavDropdown
+                            title={<FaUser size={25} style={{ color: '#093673' }} />}
+                            id="user-dropdown"
+                            align="end"
+                        >
+                            <NavDropdown.Item as={Link} to="/profile">
+                                Tài khoản
+                            </NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={handleLogout}>
+                                Đăng xuất
+                            </NavDropdown.Item>
+                        </NavDropdown>
+                    </Nav>
+                </Navbar.Collapse>
             </Container>
-        </Navbar >
+        </Navbar>
     );
-}
+};
 
 export default Header;

@@ -1,45 +1,42 @@
 const { api } = require('../../../lib/api-client');
 
-const SuccessGetAllTopic = {
-    topics: {
-        id: null,
-        "topicName": '',
-        "description": '',
-        "image": '',
-        "mp3": '',
-        "level": '',
-    }
-}
 
 const getAllTopics = async () => {
-    return await api.post(`/topics/all`)
+    return await api.get("/topics/all")
         .then((res) => {
-            return {
-                ...SuccessGetAllTopic,
-                topics: res.data.topics
-            };
+            console.log(res.data)
+            return res.data;  // Giả sử response.data là mảng các topic
         })
         .catch((error) => {
             console.error("Error fetching topics:", error);
-            return null;
+            return [];
         });
 }
 
 const getTopicByLevel = async (level) => {
-    return await api.post(`/topics/searchbylevel`, level)
+    return await api.get("/topics/searchbylevel", { params: { level } })
         .then((res) => {
-            return {
-                ...SuccessGetAllTopic,
-                topics: res.data.topics
-            };
+            return res.data;  // Giả sử response.data.topics chứa các topic
         })
         .catch((error) => {
             console.error("Error fetching topics by level:", error);
-            return null;
+            return [];
         });
+}
+
+const getTopicByID = async (topic_id) => {
+    return await api.get(`/${topic_id}`)
+        .then((res) => {
+            return res.data
+        })
+        .catch((error) => {
+            console.error("Error fetching topic's lessons", error);
+            return [];
+        })
 }
 
 module.exports = {
     getAllTopics,
-    getTopicByLevel
+    getTopicByLevel,
+    getTopicByID
 };

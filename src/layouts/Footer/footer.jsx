@@ -8,7 +8,7 @@ const Footer = () => {
         <footer className="text-center text-lg-start bg-light text-muted">
             <section className="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
                 <div className="me-5 d-none d-lg-block">
-                    <span>Get connected with us on social networks:</span>
+                    <span>Kết nối với chúng tôi:</span>
                 </div>
                 <div>
                     <a href="https://www.facebook.com/NAVEEapp" className="me-4 text-reset">
@@ -41,24 +41,24 @@ const Footer = () => {
                         </Col>
 
                         <Col md={2} lg={2} xl={2} className="mx-auto mb-4">
-                            <h6 className="text-uppercase fw-bold mb-4">About us</h6>
-                            <p><a href="/" className="text-reset">Who is NAVEE?</a></p>
-                            <p><a href="/" className="text-reset">Our founders</a></p>
-                            <p><a href="/" className="text-reset">Our journey</a></p>
+                            <h6 className="text-uppercase fw-bold mb-4">Về chúng tôi</h6>
+                            <p><a href="/" className="text-reset">Navee là ai?</a></p>
+                            <p><a href="/" className="text-reset">Những nhà sáng lập</a></p>
+                            <p><a href="/" className="text-reset">Hành trình của chúng tôi</a></p>
                             <p><a href="/" className="text-reset">NAVEEClass+</a></p>
                         </Col>
 
                         <Col md={3} lg={2} xl={2} className="mx-auto mb-4">
-                            <h6 className="text-uppercase fw-bold mb-4">Service</h6>
-                            <p><a href="#!" className="text-reset">Pricing</a></p>
-                            <p><a href="#!" className="text-reset">Settings</a></p>
-                            <p><a href="#!" className="text-reset">Orders</a></p>
-                            <p><a href="#!" className="text-reset">Help</a></p>
+                            <h6 className="text-uppercase fw-bold mb-4">Dịch vụ</h6>
+                            <p><a href="#!" className="text-reset">Giá cả</a></p>
+                            <p><a href="#!" className="text-reset">Cài đặt</a></p>
+                            <p><a href="#!" className="text-reset">Mua hàng</a></p>
+                            <p><a href="#!" className="text-reset">Hỗ trợ</a></p>
                         </Col>
 
                         <Col md={4} lg={3} xl={3} className="mx-auto mb-md-0 mb-4">
-                            <h6 className="text-uppercase fw-bold mb-4">Contact</h6>
-                            <p><FaHome className="me-3" /> Ha Noi, Viet Nam</p>
+                            <h6 className="text-uppercase fw-bold mb-4">Liên hệ</h6>
+                            <p><FaHome className="me-3" /> Hà Nội, Việt Nam</p>
                             <p><FaEnvelope className="me-3" />naveegateyourjourney@gmail.com</p>
                             <p><FaPhone className="me-3" /> (+84) 96.844.64.17</p>
                         </Col>
