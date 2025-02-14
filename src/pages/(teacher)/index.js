@@ -12,7 +12,7 @@ const Management = () => {
             <Row gutter={16} justify="start">
                 <Col xs={24} sm={12} md={12} lg={8} xl={6}>
                     <Card onClick={() => navigate('/manage-learn')}>
-                        <h3>Quản lý tài liệu</h3>
+                        <h3>Quản lý khóa học</h3>
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={12} lg={8} xl={6}>
@@ -26,8 +26,8 @@ const Management = () => {
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={12} lg={8} xl={6}>
-                    <Card onClick={() => navigate('/learn')}>
-                        <h3>Quản lý trò chơi</h3>
+                    <Card onClick={() => navigate('/manage-exercise')}>
+                        <h3>Quản lý bài tập</h3>
                     </Card>
                 </Col>
             </Row>

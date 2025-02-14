@@ -4,11 +4,9 @@ import { List, Card, Button, Row, Col } from 'antd';
 import 'antd/dist/reset.css';
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from 'react-icons/fa';
-import { getTopicByID } from "../api/getAllTopics.api";
-
-
-import traffic from '../../../assets/images/traffic1.png'
+import { getLessonByTopicId } from '../api/getAllLesson.api'
 import enrollmentSuccessful from "../api/enrollTopics.api";
+import { getTopicById } from "../api/getAllTopics.api";
 
 
 const Course = () => {
@@ -16,36 +14,46 @@ const Course = () => {
     const navigate = useNavigate();
     const [listLesson, setListLesson] = useState([]);
     const setError = useState(null);
-    const { topic_id } = useParams(); // ✅ Lấy topic_id từ URL
+    const { topic_id } = useParams();
 
     const [currentTopic, setCurrentTopic] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    //Lấy data khóa học
     useEffect(() => {
         const fetchTopic = async (topic_id) => {
-            let response;
+            // console.log(topic_id ? topic_id : "no topic id")
+            let response, topic;
             setLoading(true);
             try {
-                response = await getTopicByID(topic_id);
-                setCurrentTopic(response.data)
+                response = await getLessonByTopicId(topic_id);
+                topic = await getTopicById(topic_id);
+
+                // console.log(topic)
+                setListLesson(response.data)
+                setCurrentTopic(topic.data)
             }
             catch (error) {
-                setError('Cannot find this topic', error)
+                console.error('Cannot find this topic', error)
             }
             finally {
                 setLoading(false)
             }
+        }
+
+        if (topic_id) {
             fetchTopic(topic_id);
         }
-    }, [])
+    }, [topic_id])
 
+    //Đăng ký khóa học
     const handleEnrollTopic = async (topic_id) => {
         setLoading(true);
         try {
             await enrollmentSuccessful(topic_id);
         }
         catch (error) {
-            setError('Cannot enroll this course', error)
+            console.error('Cannot enroll this course', error)
         }
         finally {
             setLoading(false);
@@ -53,30 +61,25 @@ const Course = () => {
     };
 
     if (!currentTopic) {
-        return <div>Không tìm thấy chủ đề.</div>;
+        return (<div>Không thể tìm thấy khóa học</div>)
     }
-
 
     return (
         <MasterLayout>
             <Row gutter={[16, 16]} className="p-6">
-                {/* Cột bên trái: Danh sách bài học */}
                 <Col xs={24} md={16}>
                     <Row gutter={16} className="border rounded" style={{ backgroundColor: '#093673', padding: '16px' }}>
 
-                        {/* Tiêu đề khóa học và thông tin bên cạnh hình ảnh */}
                         <Col xs={24} md={16} className="mt-4" style={{ color: '#FFFFFF' }}>
-                            <h1 className="text-3xl font-bold">{currentTopic.title}</h1>
+                            <h1 className="text-3xl font-bold">{currentTopic.topic_name}</h1>
                             <p className="text-gray-600 mt-2">{currentTopic.description}</p>
                         </Col>
 
-                        {/* Hình ảnh và tiêu đề trong cùng một dòng */}
                         <Col xs={24} md={8}>
                             <img
                                 src={currentTopic.image}
                                 alt={currentTopic.title}
-                                className="img-fluid rounded"
-                                style={{ width: '100%', height: 'auto' }}
+                                className="img-fluid rounded h-100"
                             />
                         </Col>
 
@@ -86,9 +89,9 @@ const Course = () => {
                     <List
                         className="mt-4 text-start border rounded py-2 px-3"
                         itemLayout="horizontal"
-                        dataSource={currentTopic.lessons}
+                        dataSource={listLesson}
                         renderItem={(lesson) => (
-                            <List.Item onClick={() => navigate(`/lesson/${lesson.id}`)}>
+                            <List.Item onClick={() => navigate(`/lesson/${lesson.id}`, { state: { topic_id } })}>
                                 <List.Item.Meta
                                     title={
                                         <div className="d-flex justify-content-between align-items-center">

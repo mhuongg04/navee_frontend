@@ -9,94 +9,100 @@ import Signup from "./pages/(auth)/sign-up";
 import Management from "./pages/(teacher)/index";
 import { Route, Routes } from "react-router-dom";
 import Course from "./pages/learn/components/course";
-import Game from "./pages/learn/components/minigame";
+import Practice from "./pages/learn/components/minigame.jsx";
 import ProtectedRoute from "./utils/ProtectedRoute.jsx";
 import MyCourse from "./pages/mycourse/index.js";
 import UploadLearningMaterial from "./pages/(teacher)/learning-management/upload-topics/index";
 import UploadLessons from "./pages/(teacher)/learning-management/upload-lessons/index.jsx";
+import UploadExercises from "./pages/(teacher)/learning-management/upload-exercises/index.jsx";
 
 const renderUserRouter = () => {
     const userRouters = [
         {
             path: 'login',
-            component: <Login />,
+            element: <Login />,
             isProtected: false,
 
         },
         {
             path: 'signup',
-            component: <Signup />,
+            element: <Signup />,
             isProtected: false,
 
         },
         {
             path: '',
-            component: <Dashboard />,
+            element: <Dashboard />,
             isProtected: false,
 
         },
         {
             path: 'profile',
-            component: <Profile />,
+            element: <Profile />,
             isProtected: true,
 
         },
         {
             path: 'dictionary',
-            component: <Dictionary />,
+            element: <Dictionary />,
             isProtected: true,
 
         },
         {
             path: 'learn',
-            component: <Learn />,
+            element: <Learn />,
             isProtected: true,
 
         },
         {
             path: 'test',
-            component: <Test />,
+            element: <Test />,
             isProtected: true,
 
         },
         {
-            path: 'learn/:topicId',
-            component: <Course />,
+            path: 'learn/:topic_id',
+            element: <Course />,
             isProtected: true,
 
         },
         {
             path: 'lesson/:lessonId',
-            component: <Lesson />,
+            element: <Lesson />,
             isProtected: true,
 
         },
         {
-            path: 'game/:id',
-            component: <Game />,
+            path: 'practice/:lessonId',
+            element: <Practice />,
             isProtected: true,
 
         },
         {
             path: 'management',
-            component: <Management />,
+            element: <Management />,
             isProtected: true,
         },
         {
             path: 'dashboard',
-            component: <MyCourse />,
+            element: <MyCourse />,
             isProtected: true,
         },
         {
             path: '/manage-learn',
-            component: <UploadLearningMaterial />,
+            element: <UploadLearningMaterial />,
             isProtected: true,
         },
         {
             path: '/manage-lessons',
-            component: <UploadLessons />,
+            element: <UploadLessons />,
             isProtected: true,
         },
+        {
+            path: '/manage-exercise',
+            element: <UploadExercises />,
+            isProtected: true,
+        }
     ]
 
     return (
@@ -108,9 +114,9 @@ const renderUserRouter = () => {
                         path={item.path}
                         element={
                             item.isProtected ? (
-                                <ProtectedRoute>{item.component}</ProtectedRoute>
+                                <ProtectedRoute>{item.element}</ProtectedRoute>
                             ) : (
-                                item.component
+                                item.element
                             )
                         }
                     />

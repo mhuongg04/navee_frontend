@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Modal, Input, Form, notification, Select } from "antd";
+import { Button, Modal, Input, Form, notification, Select, Upload } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import uploadTopic from "./api/uploadTopic";
 import { AxiosError } from "axios";
 
@@ -13,7 +14,7 @@ const UploadTopicButton = () => {
     const [level, setLevel] = useState("");
     const [topicName, setTopicName] = useState("");
     const [description, setDescription] = useState("");
-    const [image, setImage] = useState("");
+    const [image, setImage] = useState(null);
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
@@ -22,12 +23,13 @@ const UploadTopicButton = () => {
         setLoading(true);
 
         try {
-            const response = await uploadTopic({
-                topic_name: topicName,
-                description,
-                image,
-                level
-            });
+            const formData = new FormData();
+            formData.append("topic_name", topicName);
+            formData.append("description", description);
+            formData.append("image", image);
+            formData.append("level", level);
+
+            await uploadTopic(formData);
 
             notification.success({
                 message: "Tạo topic thành công",
@@ -38,7 +40,7 @@ const UploadTopicButton = () => {
 
             setTopicName("");
             setDescription("");
-            setImage("");
+            setImage(null);
             setLevel("");
         } catch (error) {
             if (error instanceof AxiosError) {
@@ -100,11 +102,17 @@ const UploadTopicButton = () => {
                         label="Hình ảnh"
                         required
                     >
-                        <Input
-                            value={image}
-                            onChange={(e) => setImage(e.target.value)}
-                            placeholder="Nhập link hình ảnh..."
-                        />
+                        <Upload
+                            beforeUpload={(file) => {
+                                setImage(file);
+                                return false;
+                            }}
+                            accept="image/png, image/jpeg"
+                            showUploadList={false}
+                        >
+                            <Button icon={<UploadOutlined />}>Chọn file hình ảnh</Button>
+                        </Upload>
+                        {image && <p>{image.name}</p>}
                     </Form.Item>
 
                     <Form.Item

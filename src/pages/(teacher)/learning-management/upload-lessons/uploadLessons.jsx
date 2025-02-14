@@ -15,7 +15,7 @@ const UploadLessonButton = () => {
     const [part, setPart] = useState("");
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [image, setImage] = useState("");
+    const [image, setImage] = useState(null);
     const [mp3, setMp3] = useState(null);
 
     const handleShow = () => setShow(true);
@@ -55,7 +55,7 @@ const UploadLessonButton = () => {
             formData.append("mp3", mp3);
             formData.append("part", part);
 
-            console.log(formData.get("title"))
+            //console.log(formData.get("title"))
             await uploadLesson(formData);
 
             notification.success({
@@ -67,7 +67,7 @@ const UploadLessonButton = () => {
 
             setTitle("");
             setDescription("");
-            setImage("");
+            setImage(null);
             setTopicId("");
             setPart("");
             setMp3(null);
@@ -107,12 +107,28 @@ const UploadLessonButton = () => {
                         <Input value={part} onChange={(e) => setPart(e.target.value)} placeholder="Nhập số thứ tự phần..." />
                     </Form.Item>
 
-                    <Form.Item label="Mô tả" required>
-                        <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Nhập mô tả..." />
+                    <Form.Item label="Script" required>
+                        <Input.TextArea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Nhập mô tả..."
+                            autoSize={{ minRows: 3, maxRows: 6 }}
+                        />
                     </Form.Item>
 
                     <Form.Item label="Hình ảnh" required>
-                        <Input value={image} onChange={(e) => setImage(e.target.value)} placeholder="Nhập link hình ảnh..." />
+                        <Upload
+                            beforeUpload={(file) => {
+                                setImage(file);
+                                return false;
+                            }}
+                            accept="image/png, image/jpeg"
+                            showUploadList={false}
+                        >
+                            <Button icon={<UploadOutlined />}>Chọn file hình ảnh</Button>
+                        </Upload>
+                        {image && <p>{image.name}</p>}
+
                     </Form.Item>
 
                     <Form.Item label="Chủ đề" required>

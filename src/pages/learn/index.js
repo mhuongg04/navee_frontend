@@ -121,7 +121,7 @@ const Learn = () => {
                   style={{ height: '13rem' }}
                 />
               }
-              onClick={() => navigate(`/learn/${item.title}`)}
+              onClick={() => navigate(`/learn/${item.id}`)}
               style={{ cursor: 'pointer' }}
               title={item.title}
             >

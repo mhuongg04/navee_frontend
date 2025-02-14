@@ -1,193 +1,140 @@
 import React, { useState, useEffect } from "react";
+import { getExercise } from "../api/getExercise.api";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useNavigate, useParams } from "react-router-dom";
+import "../../../style/Practice.css";
 
-const wordList = [
-    {
-        id: 1,
-        tittle: "Topic 1: Lesson 1",
-        parts: [
-            { word: "pedestrian", hint: "A person walking on the road" },
-            { word: "traffic jam", hint: "When vehicles cannot move" },
-            { word: "passenger", hint: "A person traveling in a vehicle" },
-            { word: "seat belt", hint: "Safety device in cars" },
-            { word: "bumpy", hint: "An uneven or rough road" }
-        ]
-    },
-    {
-        id: 2,
-        tittle: "Topic 1: Lesson 2",
-        parts: [
-            { word: "vehicle", hint: "A thing used to travel, like a car or bus" },
-            { word: "pavement", hint: "The hard path where people walk" },
-            { word: "motorbike", hint: "A small vehicle with two wheels and a motor" },
-            { word: "handlebar", hint: "The part you hold to steer a bike or motorbike" },
-            { word: "traffic law", hint: "The rules for how cars and people should behave on the road" }
-        ]
-    },
-    {
-        id: 3,
-        tittle: "Topic 1: Lesson 3",
-        parts: [
-            { word: "rush hour", hint: "The time when many people are on the road" },
-            { word: "car", hint: "A vehicle with four wheels that people drive" },
-            { word: "bus", hint: "A big vehicle that carries many people" },
-            { word: "airplane", hint: "A vehicle that flies in the sky" }
-        ]
-    }
-
-];
-
-const Game = () => {
-    const { id } = useParams();  // Lấy id từ URL
-    const lesson = wordList.find((lesson) => lesson.id === parseInt(id));
-    const [currentWordIndex, setCurrentWordIndex] = useState(0);
-    const [correctLetters, setCorrectLetters] = useState([]);
-    const [wrongLetters, setWrongLetters] = useState([]);
-    const [maxGuesses, setMaxGuesses] = useState(6);
-    const [inputValue, setInputValue] = useState("");
-    const [gameCompleted, setGameCompleted] = useState(false);
-
-    const { word, hint } = lesson ? lesson.parts[currentWordIndex] : {};
-
+const Practice = () => {
     const navigate = useNavigate();
-
-    // Hàm đọc đoạn hint
-    const speakHint = (text) => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        speechSynthesis.speak(utterance);
-    };
+    const location = useLocation();
+    const { lessonId } = useParams();
+    const [exercises, setExercises] = useState([]);
+    const [answers, setAnswers] = useState({});
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [score, setScore] = useState(0);
+    const [progress, setProgress] = useState(0);
+    const topic_id = location.state?.topic_id;
 
     useEffect(() => {
-        speakHint(hint);
-    }, [hint]);
+        const fetchExercises = async () => {
+            try {
+                const response = await getExercise(lessonId);
+                setExercises(response.exercises);
+            } catch (error) {
+                console.error("Lỗi khi lấy bài tập:", error);
+            }
+        };
 
-    const resetCurrentWord = () => {
-        setCorrectLetters([]);
-        setWrongLetters([]);
-        setMaxGuesses(word.length >= 5 ? 8 : 6);
-        setInputValue("");
+        fetchExercises();
+    }, [lessonId]);
+
+    const handleChange = (e, id) => {
+        setAnswers({ ...answers, [id]: e.target.value });
     };
 
-    const handleInputChange = (e) => {
-        const letter = e.target.value.toLowerCase();
-        setInputValue(""); // Clear input field
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let newScore = 0;
+        let correctCount = 0;
+        let hasWrongAnswer = false;
 
-        if (
-            !/^[a-z]$/.test(letter) ||
-            wrongLetters.includes(letter) ||
-            correctLetters.includes(letter)
-        ) {
-            return;
-        }
+        exercises.forEach(ex => {
+            if (answers[ex.id]?.toLowerCase().trim() === ex.answer.toLowerCase().trim()) {
+                newScore += ex.point;
+                correctCount++;
+            } else {
+                hasWrongAnswer = true;
+            }
+        });
 
-        if (word.includes(letter)) {
-            setCorrectLetters((prev) => [...prev, letter]);
-        } else {
-            setWrongLetters((prev) => [...prev, letter]);
-            setMaxGuesses((prev) => prev - 1);
-        }
-    };
+        setScore(newScore);
+        setProgress((correctCount / exercises.length) * 100);
+        setIsSubmitted(true);
 
-
-
-    const handleNextWord = () => {
-        if (currentWordIndex + 1 < lesson.parts.length) {
-            setCurrentWordIndex((prev) => prev + 1);
-            resetCurrentWord();
-        } else {
-            setGameCompleted(true);
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter" && allLettersGuessed) {
-            handleNextWord();
+        if (hasWrongAnswer && navigator.vibrate) {
+            navigator.vibrate([200, 100, 200]);
         }
     };
 
-    const allLettersGuessed = word
-        .replace(/ /g, "") // Ignore spaces
-        .split("")
-        .every((letter) => correctLetters.includes(letter));
+    const handleReset = () => {
+        setIsSubmitted(false);
+        setScore(0);
+        setAnswers({});
+    };
 
     return (
         <div className="container mt-5">
-            <h1 className="text-center mb-4">Guess the Word Game</h1>
-            <div className="card p-4 shadow-sm">
-                {!gameCompleted ? (
-                    <>
-                        <div className="mb-3">
-                            <h5 className="card-title">Gợi ý: <span className="text-primary">{hint}</span></h5>
-                        </div>
-                        <div className="mb-3">
-                            <h6 className="card-subtitle mb-2 text-muted">
-                                Số lần đoán còn lại: <span className="text-danger">{maxGuesses}</span>
-                            </h6>
-                        </div>
-                        <div className="mb-3">
-                            <h6 className="card-subtitle mb-2 text-muted">
-                                Đoán sai: <span className="text-danger">{wrongLetters.join(", ") || "None"}</span>
-                            </h6>
-                        </div>
-                        <div className="d-flex justify-content-center mb-3">
-                            {word.split("").map((letter, idx) => (
+            <div className="card shadow-lg p-4">
+                <h2 className="text-center text-primary fw-bold">🏆 Bài tập 🏆</h2>
+
+                {/* Thanh tiến trình */}
+                <div className="progress mt-3" style={{ height: "20px" }}>
+                    <div
+                        className="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                        role="progressbar"
+                        style={{ width: `${progress}%` }}
+                    >
+                        {Math.round(progress)}%
+                    </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="mt-4">
+                    {exercises.length > 0 ? (
+                        exercises.map((ex, index) => (
+                            <div
+                                key={ex.id}
+                                className={`card p-3 mb-3 shadow-sm border-0 ${isSubmitted && answers[ex.id] !== ex.answer ? "shake" : ""
+                                    }`}
+                            >
+                                <p className="mb-2 fw-bold">
+                                    🚧 Câu {index + 1}: {ex.question}
+                                </p>
                                 <input
-                                    key={idx}
                                     type="text"
-                                    className="form-control mx-1"
-                                    style={{ width: "3rem", textAlign: "center" }}
-                                    value={correctLetters.includes(letter) || letter === " " ? letter : ""}
-                                    disabled
+                                    onChange={(e) => handleChange(e, ex.id)}
+                                    disabled={isSubmitted}
+                                    className="form-control rounded-pill"
+                                    placeholder="Nhập câu trả lời..."
                                 />
-                            ))}
-                        </div>
-                        <input
-                            type="text"
-                            className="form-control mb-3"
-                            placeholder="Type a letter"
-                            value={inputValue}
-                            maxLength="1"
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <div className="text-center">
-                            {allLettersGuessed && (
-                                <button className="btn btn-success me-2" onClick={handleNextWord}>
-                                    Từ tiếp theo
-                                </button>
-                            )}
-                            {!allLettersGuessed && (
-                                <button className="btn btn-primary me-2" onClick={resetCurrentWord}>
-                                    Chơi lại
-                                </button>
-                            )}
-                            <span className="px-3"></span>
-                            <button className="btn btn-primary" onClick={() => navigate('/learn/1')}>
-                                Trở lại trang học tập
+                                {isSubmitted && (
+                                    <p
+                                        className={`mt-2 fw-bold ${answers[ex.id] === ex.answer ? "text-success" : "text-danger"
+                                            }`}
+                                    >
+                                        {answers[ex.id] === ex.answer
+                                            ? "✅ Đúng! Bạn vượt qua chướng ngại vật!"
+                                            : `❌ Sai, Đáp án: ${ex.answer}`}
+                                    </p>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-warning">⏳ Đang tải bài tập...</p>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitted}
+                        className="btn btn-primary w-100 mt-3 fw-bold"
+                    >
+                        🏁 Nộp bài
+                    </button>
+                </form>
+
+                {isSubmitted && (
+                    <div className="text-center mt-4">
+                        <h3 className="text-info fw-bold">🎉 Điểm của bạn: {score} 🎉</h3>
+                        <div className="d-flex justify-content-center gap-3 mt-3">
+                            <button onClick={handleReset} className="btn btn-outline-primary">
+                                🔄 Làm lại
+                            </button>
+                            <button
+                                onClick={() => navigate(`/learn/${topic_id}`)}
+                                className="btn btn-success"
+                            >
+                                ⏪ Trở về khóa học
                             </button>
                         </div>
-                        {maxGuesses < 1 && !allLettersGuessed && (
-                            <div className="alert alert-danger mt-3 text-center">
-                                Game Over! The word was <strong>{word.toUpperCase()}</strong>.
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <div className="text-center">
-                        <h2 className="text-success">Congrats! 🎉 You guessed all the words!</h2>
-                        <button className="btn btn-primary mt-3" onClick={() => {
-                            setGameCompleted(false);
-                            setCurrentWordIndex(0);
-                            resetCurrentWord();
-                        }}>
-                            Play Again
-                        </button>
-                        <span className="px-3"></span>
-                        <button className="btn btn-primary mt-3" onClick={() => navigate('/learn/1')}>
-                            Return to Dashboard
-                        </button>
                     </div>
                 )}
             </div>
@@ -195,4 +142,4 @@ const Game = () => {
     );
 };
 
-export default Game;
+export default Practice;

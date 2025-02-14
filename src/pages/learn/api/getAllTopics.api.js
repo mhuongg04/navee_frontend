@@ -1,6 +1,6 @@
 const { api } = require('../../../lib/api-client');
 
-
+//Lấy toàn bộ các khóa học
 const getAllTopics = async () => {
     return await api.get("/topics/all")
         .then((res) => {
@@ -13,6 +13,7 @@ const getAllTopics = async () => {
         });
 }
 
+//Lọc khóa học theo level
 const getTopicByLevel = async (level) => {
     return await api.get("/topics/searchbylevel", { params: { level } })
         .then((res) => {
@@ -24,19 +25,20 @@ const getTopicByLevel = async (level) => {
         });
 }
 
-const getTopicByID = async (topic_id) => {
+//Tìm khóa học theo ID
+const getTopicById = async (topic_id) => {
     return await api.get(`/${topic_id}`)
         .then((res) => {
             return res.data
         })
         .catch((error) => {
-            console.error("Error fetching topic's lessons", error);
-            return [];
+            console.error("Error get Topic by Id", error);
+            return;
         })
 }
 
 module.exports = {
     getAllTopics,
     getTopicByLevel,
-    getTopicByID
+    getTopicById
 };
