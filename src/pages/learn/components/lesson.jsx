@@ -10,9 +10,10 @@ const Lesson = () => {
     const location = useLocation();
     const { lessonId } = useParams();
     const [currentLesson, setCurrentLesson] = useState(null);
-    const [isLoading, setLoading] = useState(false);
-    const setError = useState(null);
+    const [, setLoading] = useState(false);
     const topic_id = location.state?.topic_id;
+    const [isPracticeMode, setIsPracticeMode] = useState(false);
+
 
     // Lấy data bài học
     useEffect(() => {
@@ -39,6 +40,7 @@ const Lesson = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (audioRef.current) {
+                audioRef.current.src = isPracticeMode ? currentLesson.mp3_prac : currentLesson.mp3;
                 audioRef.current.load();
                 audioRef.current.addEventListener('canplaythrough', () => {
                     audioRef.current.play();
@@ -49,21 +51,37 @@ const Lesson = () => {
         return () => {
             clearTimeout(timer);
         };
-    }, []);
+    }, [isPracticeMode, currentLesson]);
 
     if (!currentLesson) {
-        return <div>Loading...</div>; // Conditional rendering, but hooks are not affected
+        return <div>Loading...</div>;
     }
 
     return (
         <>
-            <div
-                className="d-flex align-items-center p-3 text-start"
-                onClick={() => navigate(`/learn/${topic_id}`)}
-                style={{ cursor: 'pointer' }}
-            >
-                <FaArrowLeft className="mr-2" />
-                <span className='px-3 fs-5'>Trở lại trang học tập</span>
+            <div className="d-flex align-items-center justify-content-between p-3">
+                <div
+                    className="d-flex align-items-center text-start"
+                    onClick={() => navigate(-1)}
+                    style={{ cursor: 'pointer' }}
+                >
+                    <FaArrowLeft className="mr-2" />
+                    <span className='px-3 fs-5'> Trở lại trang học tập</span>
+                </div>
+
+                <Button
+                    className="rounded-4"
+                    style={{
+                        backgroundColor: "#093673",
+                        color: "white",
+                        border: "none",
+                        fontSize: "20px",
+                        padding: "22px 30px",
+                    }}
+                    onClick={() => navigate(`/vocab/${lessonId}`, { state: { topic_id } })}
+                >
+                    Từ vựng
+                </Button>
             </div>
             <h2 className='mt-1'>{currentLesson.title}</h2>
             <div className="container border rounded border-info border-2 w-full h-full mt-3" style={{ padding: '20px' }}>
@@ -72,7 +90,7 @@ const Lesson = () => {
                         <Card title="Audio Player" bordered={false}>
                             <div>
                                 <audio ref={audioRef} controls>
-                                    <source src={currentLesson.mp3} type="audio/mp3" />
+                                    <source src={isPracticeMode ? currentLesson.mp3_prac : currentLesson.mp3} type="audio/mp3" />
                                     Your browser does not support the audio element.
                                 </audio>
                             </div>
@@ -100,21 +118,43 @@ const Lesson = () => {
                         <Card title="Story" bordered={false}>
                             <h5 className="text-start">Script:</h5>
                             <p className="text-start">
-                                {currentLesson.description}
+                                {isPracticeMode ? currentLesson.des_prac : currentLesson.description}
                             </p>
                         </Card>
                     </Col>
                 </Row>
             </div>
 
-            <div className="text-center mt-2">
+            <div className="text-center mt-2 d-flex justify-content-center gap-3">
                 <Button
                     onClick={() => navigate(`/practice/${lessonId}`, { state: { topic_id } })}
-                    className="px-5 py-4 btn-lg btn-warning"
+                    className="rounded-4"
+                    style={{
+                        backgroundColor: "#093673",
+                        color: "white",
+                        border: "none",
+                        fontSize: "20px",
+                        padding: "22px 30px",
+                    }}
                 >
-                    Luyện tập
+                    Kiểm tra Từ mới
+                </Button>
+
+                <Button
+                    onClick={() => setIsPracticeMode(!isPracticeMode)}
+                    className="rounded-4"
+                    style={{
+                        backgroundColor: "#093673",
+                        color: "white",
+                        border: "none",
+                        fontSize: "20px",
+                        padding: "22px 30px",
+                    }}
+                >
+                    {isPracticeMode ? "< Quay lại bài học" : "Luyện tập >"}
                 </Button>
             </div>
+
         </>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Spin, Typography, Avatar } from "antd";
+import { Spin, Typography, Avatar } from "antd";
 import { Container, Row, Col } from "react-bootstrap";
 import MasterLayout from "../../layouts/MasterLayout/masterlayout";
 import getUserInfo from "./api/getInfo.api";

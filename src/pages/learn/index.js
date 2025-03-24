@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { List, Skeleton, Avatar, Card, Search } from 'antd';
+import { List, Card } from 'antd';
 import MasterLayout from '../../layouts/MasterLayout/masterlayout';
 import { getAllTopics, getTopicByLevel } from './api/getAllTopics.api';
-import traffic1 from '../../assets/images/traffic1.png';
 import logo from '../../assets/images/logo/NAVEE_logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
+import LazyLoad from 'react-lazyload';
 // const { Container } = require('react-bootstrap');
 // const NavDropdown = require('react-bootstrap/NavDropdown');
 
@@ -13,16 +13,16 @@ import { useMediaQuery } from 'react-responsive';
 const Learn = () => {
   //const [filteredTopic, setFilteredTopic] = useState([]);
   const [listTopic, setListTopic] = useState([]);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [isLoading, setLoading] = useState(true);
   const [level, setLevel] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  //const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredData = (level, searchTerm) => {
-    if (level) {
+  // const filteredData = (level, searchTerm) => {
+  //   if (level) {
 
-    }
-  }
+  //   }
+  // }
 
 
 
@@ -42,7 +42,7 @@ const Learn = () => {
         } else {
           setListTopic([]);
         }
-        console.log(response.data)
+        //console.log(response.data)
       }
       catch (error) {
         setError('Cannot load data', error);
@@ -105,30 +105,33 @@ const Learn = () => {
                         onSearch={onSearch}
                     /> */}
       </div>
-      <List
-        className="custom-scrollbar mt-4 max-h-[450px] pb-4"
-        grid={{ gutter: 16, column: isMobile ? 1 : isTablet ? 2 : 5 }}
-        loading={isLoading}
-        dataSource={listTopic}
-        bordered
-        renderItem={(item) => (
-          <List.Item>
-            <Card
-              cover={
-                <img
-                  alt={item.title}
-                  src={item.image}
-                  style={{ height: '13rem' }}
-                />
-              }
-              onClick={() => navigate(`/learn/${item.id}`)}
-              style={{ cursor: 'pointer' }}
-              title={item.title}
-            >
-              <h5>{item.topic_name}</h5>
-            </Card>
-          </List.Item>)}
-      />
+      <LazyLoad>
+        <List
+          className="custom-scrollbar mt-4 max-h-[450px] pb-4"
+          grid={{ gutter: 16, column: isMobile ? 1 : isTablet ? 2 : 5 }}
+          loading={isLoading}
+          dataSource={listTopic}
+          renderItem={(item) => (
+            <List.Item>
+              <Card
+                cover={
+                  <LazyLoad once>
+                    <img
+                      alt={item.title}
+                      src={item.image ? item.image : logo}
+                      style={{ width: '90%', height: '13rem', objectFit: 'cover' }}
+                    />
+                  </LazyLoad>
+                }
+                onClick={() => navigate(`/learn/${item.id}`)}
+                style={{ cursor: 'pointer' }}
+                title={item.title}
+              >
+                <h5>{item.topic_name}</h5>
+              </Card>
+            </List.Item>)}
+        />
+      </LazyLoad>
       {/* <List
         className="custom-scrollbar mt-4 max-h-[450px] overflow-y-auto pb-4"
         grid={{ gutter: 16, column: isMobile ? 1 : isTablet ? 2 : 5 }}

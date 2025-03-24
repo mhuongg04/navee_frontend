@@ -1,5 +1,5 @@
 import MasterLayout from "../../../layouts/MasterLayout/masterlayout"
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { List, Card, Button, Row, Col } from 'antd';
 import 'antd/dist/reset.css';
 import React, { useState, useEffect } from "react";
@@ -13,23 +13,20 @@ const Course = () => {
 
     const navigate = useNavigate();
     const [listLesson, setListLesson] = useState([]);
-    const setError = useState(null);
     const { topic_id } = useParams();
 
     const [currentTopic, setCurrentTopic] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [, setLoading] = useState(false);
 
     //Lấy data khóa học
     useEffect(() => {
-        const fetchTopic = async (topic_id) => {
-            // console.log(topic_id ? topic_id : "no topic id")
+        const fetchTopic = async () => {
             let response, topic;
             setLoading(true);
             try {
                 response = await getLessonByTopicId(topic_id);
                 topic = await getTopicById(topic_id);
 
-                // console.log(topic)
                 setListLesson(response.data)
                 setCurrentTopic(topic.data)
             }
@@ -42,7 +39,7 @@ const Course = () => {
         }
 
         if (topic_id) {
-            fetchTopic(topic_id);
+            fetchTopic();
         }
     }, [topic_id])
 
@@ -95,9 +92,14 @@ const Course = () => {
                                 <List.Item.Meta
                                     title={
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <a className="text-dark font-weight-semibold text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                                            <Link
+                                                to={`/lesson/${lesson.id}`}
+                                                state={{ topic_id }}
+                                                className="text-dark font-weight-semibold text-decoration-none"
+                                                style={{ fontSize: '1.1rem' }}
+                                            >
                                                 {lesson.title}
-                                            </a>
+                                            </Link>
                                             <FaArrowRight className="text-muted" />
                                         </div>
                                     }

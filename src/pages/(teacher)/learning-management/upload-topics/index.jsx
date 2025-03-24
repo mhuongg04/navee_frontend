@@ -7,9 +7,9 @@ import UploadTopicButton from './uploadTopic';
 const UploadLearningMaterial = () => {
 
     const [listTopic, setListTopic] = useState([]);
-    const [error, setError] = useState(null);
-    const [isLoading, setLoading] = useState(true);
-    const [level, setLevel] = useState('');
+    const [, setError] = useState(null);
+    const [, setLoading] = useState(true);
+    const [level,] = useState('');
 
     //Danh sách lộ trình học
     useEffect(() => {
