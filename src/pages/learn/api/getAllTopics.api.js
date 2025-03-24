@@ -4,8 +4,7 @@ const { api } = require('../../../lib/api-client');
 const getAllTopics = async () => {
     return await api.get("/topics/all")
         .then((res) => {
-            console.log(res.data)
-            return res.data;  // Giả sử response.data là mảng các topic
+            return res.data;
         })
         .catch((error) => {
             console.error("Error fetching topics:", error);
@@ -17,7 +16,7 @@ const getAllTopics = async () => {
 const getTopicByLevel = async (level) => {
     return await api.get("/topics/searchbylevel", { params: { level } })
         .then((res) => {
-            return res.data;  // Giả sử response.data.topics chứa các topic
+            return res.data;
         })
         .catch((error) => {
             console.error("Error fetching topics by level:", error);

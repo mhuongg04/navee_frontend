@@ -1,4 +1,4 @@
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Divider, Row } from 'antd';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MasterLayout from '../../layouts/MasterLayout/masterlayout';
@@ -28,6 +28,12 @@ const Management = () => {
                 <Col xs={24} sm={12} md={12} lg={8} xl={6}>
                     <Card onClick={() => navigate('/manage-exercise')}>
                         <h3>Quản lý bài tập</h3>
+                    </Card>
+                </Col>
+                <Divider />
+                <Col xs={24} sm={12} md={12} lg={8} xl={6}>
+                    <Card onClick={() => navigate('/manage-dictionary')}>
+                        <h3>Quản lý Từ điển</h3>
                     </Card>
                 </Col>
             </Row>

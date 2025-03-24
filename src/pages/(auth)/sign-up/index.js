@@ -130,7 +130,7 @@ const Signup = () => {
                             rules={[
                                 { required: true, message: "Hãy điền mật khẩu của bạn!" }
                             ]}>
-                            <Input placeholder="Điền mật khẩu" />
+                            <Input.Password placeholder="Điền mật khẩu" />
                         </Form.Item>
                         <Form.Item label="Vai trò" name="role">
                             <Select

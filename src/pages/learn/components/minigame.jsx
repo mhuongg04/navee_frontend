@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { getExercise } from "../api/getExercise.api";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../../style/Practice.css";
 
 const Practice = () => {
     const navigate = useNavigate();
-    const location = useLocation();
+    // const location = useLocation();
     const { lessonId } = useParams();
     const [exercises, setExercises] = useState([]);
     const [answers, setAnswers] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [score, setScore] = useState(0);
     const [progress, setProgress] = useState(0);
-    const topic_id = location.state?.topic_id;
 
     useEffect(() => {
         const fetchExercises = async () => {
@@ -67,7 +66,6 @@ const Practice = () => {
             <div className="card shadow-lg p-4">
                 <h2 className="text-center text-primary fw-bold">🏆 Bài tập 🏆</h2>
 
-                {/* Thanh tiến trình */}
                 <div className="progress mt-3" style={{ height: "20px" }}>
                     <div
                         className="progress-bar progress-bar-striped progress-bar-animated bg-success"
@@ -129,7 +127,7 @@ const Practice = () => {
                                 🔄 Làm lại
                             </button>
                             <button
-                                onClick={() => navigate(`/learn/${topic_id}`)}
+                                onClick={() => navigate(-1)}
                                 className="btn btn-success"
                             >
                                 ⏪ Trở về khóa học
