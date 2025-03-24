@@ -1,12 +1,13 @@
 import MasterLayout from "../../../layouts/MasterLayout/masterlayout"
 import { useNavigate, useParams } from 'react-router-dom';
-import { List, Card, Button, Row, Col } from 'antd';
+import { List, Card, Button, Row, Col, message } from 'antd';
 import 'antd/dist/reset.css';
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from 'react-icons/fa';
 import { getLessonByTopicId } from '../api/getAllLesson.api'
 import enrollmentSuccessful from "../api/enrollTopics.api";
 import { getTopicById } from "../api/getAllTopics.api";
+import { getUserPoints } from "../../user/api/userPoints.api";
 
 
 const Course = () => {
@@ -18,42 +19,60 @@ const Course = () => {
 
     const [currentTopic, setCurrentTopic] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [userPoints, setUserPoints] = useState(0);
 
     //Lấy data khóa học
     useEffect(() => {
-        const fetchTopic = async (topic_id) => {
-            // console.log(topic_id ? topic_id : "no topic id")
-            let response, topic;
+        const fetchData = async () => {
             setLoading(true);
             try {
-                response = await getLessonByTopicId(topic_id);
-                topic = await getTopicById(topic_id);
-
-                // console.log(topic)
-                setListLesson(response.data)
-                setCurrentTopic(topic.data)
+                // Lấy bài học
+                const lessonResponse = await getLessonByTopicId(topic_id);
+                
+                // Lấy thông tin topic
+                const topicResponse = await getTopicById(topic_id);
+                
+                // Lấy điểm người dùng
+                const pointsData = await getUserPoints();
+                
+                setListLesson(lessonResponse.data);
+                setCurrentTopic(topicResponse.data);
+                setUserPoints(pointsData.earnpoints || 0);
             }
             catch (error) {
-                console.error('Cannot find this topic', error)
+                console.error('Error fetching data', error);
             }
             finally {
-                setLoading(false)
+                setLoading(false);
             }
         }
 
         if (topic_id) {
-            fetchTopic(topic_id);
+            fetchData();
         }
-    }, [topic_id])
+    }, [topic_id]);
 
     //Đăng ký khóa học
     const handleEnrollTopic = async (topic_id) => {
         setLoading(true);
         try {
-            await enrollmentSuccessful(topic_id);
+            const response = await enrollmentSuccessful(topic_id);
+            console.log("Enrollment response:", response); 
+            // Kiểm tra response từ API
+            if (response && response.status === 201) { 
+                message.success("Đăng ký khóa học thành công!", 2, () => {
+                    navigate('/dashboard');
+                });
+            }
         }
         catch (error) {
-            console.error('Cannot enroll this course', error)
+            console.error('Cannot enroll this course', error);
+            // Hiển thị thông báo lỗi nếu cần
+            if (error.response && error.response.status === 400 && error.response.data.message === "Already enrolled in this topic") {
+                alert("Bạn đã đăng ký khóa học này rồi!");
+            } else {
+                alert("Không thể đăng ký khóa học. Vui lòng thử lại sau.");
+            }
         }
         finally {
             setLoading(false);
@@ -113,6 +132,9 @@ const Course = () => {
                         <h3 className="text-lg font-semibold">Thông tin khóa học</h3>
                         <p className="mt-2"><strong>Tổng thời gian:</strong> {currentTopic.totalHours} giờ</p>
                         <p><strong>Lessons:</strong> {currentTopic.lessonsCount}</p>
+                        {userPoints > 0 && (
+                            <p className="mt-2"><strong>Điểm của bạn:</strong> <span className="text-success">{userPoints} điểm</span></p>
+                        )}
                         <Button type="primary" className="w-full mt-4" onClick={() => handleEnrollTopic(currentTopic.id)}>Đăng ký học</Button>
                     </Card>
                 </Col>
