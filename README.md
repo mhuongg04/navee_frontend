@@ -1,70 +1,35 @@
-# Getting Started with Create React App
+# NAVEE - An English learning website for visually impaired student (Frontend)
+-------------------------
+## We are still on our developing progress
+-------------------------
+## How to run the code
+1. Clone this repository and navee_backend repository (also on my account) for full experience
+2. Run "npm install" (at first time)
+3. Run "npm run start" (for the developing environment)
+-------------------------
+## Features
+The website includes features for students and teachers (also admin - just temporary, we are thinking to separate these 2 roles)
+For students, they can learn all the free courses through the website, note the vocabularies to the flashcard, take the tests. We are on the way to train an AI model helps recognize voices and do the pronunciation assessment.
+For teachers, they can upload, edit or delete courses, tests, vocabs and flashcards (students are also able to create their own flashcards too)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![image](https://github.com/user-attachments/assets/5150f901-deec-4d29-9719-2d72e146321e)
+![image](https://github.com/user-attachments/assets/80e7095a-12f4-4840-9adb-acc868f8bd49)
+![image](https://github.com/user-attachments/assets/3a7aae35-7453-408d-8dd9-aba11f5d66f2)
+![image](https://github.com/user-attachments/assets/95f8ed5f-b288-4f7d-8e5e-cab621c92a94)
+![image](https://github.com/user-attachments/assets/37b19dd4-e139-4867-93c3-0c174373b8d2)
+![image](https://github.com/user-attachments/assets/c6e86a76-aaa9-45c4-94d9-79617ab76bd0)
+![image](https://github.com/user-attachments/assets/74451d90-3b27-476f-88e9-96f61bf310ed)
+![image](https://github.com/user-attachments/assets/41692cd7-1881-48a7-9dab-5504128b18ec)
+![image](https://github.com/user-attachments/assets/d8dca3ff-b152-4cfa-950e-2fa8f1d4739d)
+![image](https://github.com/user-attachments/assets/13f145b4-c02d-456c-9af9-d890861fb1f0)
+![image](https://github.com/user-attachments/assets/cf6633f1-9826-4b28-a483-0455244e2530)
 
-## Available Scripts
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
