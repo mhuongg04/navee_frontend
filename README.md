@@ -8,7 +8,7 @@
 3. Run "npm run start" (for the developing environment)
 -------------------------
 ## Features
-The website includes features for students and teachers (also admin - just temporary, we are thinking to separate these 2 roles)
+The website includes features for students and teachers
 For students, they can learn all the free courses through the website, note the vocabularies to the flashcard, take the tests. We are on the way to train an AI model helps recognize voices and do the pronunciation assessment.
 For teachers, they can upload, edit or delete courses, tests, vocabs and flashcards (students are also able to create their own flashcards too)
 
