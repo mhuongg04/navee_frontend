@@ -19,9 +19,21 @@ const getTopicByLevel = async (level) => {
             return res.data;
         })
         .catch((error) => {
-            console.error("Error fetching topics by level:", error);
+            console.error("Không thể tìm thấy khóa học theo cấp độ", error);
             return [];
         });
+}
+
+//Tìm khóa học theo tên
+const getTopicByName = async (topicName) => {
+    return await api.get("/topics/searchbyname", { params: { topicName } })
+        .then((res) => {
+            return res.data
+        })
+        .catch((error) => {
+            console.error("Không thể tìm được khóa học theo tên", error);
+            return;
+        })
 }
 
 //Tìm khóa học theo ID
@@ -39,5 +51,6 @@ const getTopicById = async (topic_id) => {
 module.exports = {
     getAllTopics,
     getTopicByLevel,
+    getTopicByName,
     getTopicById
 };

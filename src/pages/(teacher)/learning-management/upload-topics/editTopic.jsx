@@ -1,77 +1,68 @@
-import { useState } from "react";
-import { Button, Modal, Input, Form, notification, Select, Upload } from "antd";
+import { useState } from "react"
+import editTopic from "./api/editTopic.api";
+import { Button, Form, Modal, Input, Select, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import uploadTopic from "./api/uploadTopic.api";
 
 const { Option } = Select;
 
+const EditTopicButton = ({ topic_id, topic_name, description, image, level }) => {
+    const [newTopicName, setTopicName] = useState('');
+    const [newDescription, setDescription] = useState('');
+    const [newImage, setImage] = useState(null);
+    const [newLevel, setLevel] = useState('');
+    const [isLoading, setLoading] = useState(false);
+    const [isShow, setShow] = useState(false);
 
-//Tạo mới các khóa học
-const UploadTopicButton = ({ onAddTopic }) => {
-    const [show, setShow] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [level, setLevel] = useState("");
-    const [topicName, setTopicName] = useState("");
-    const [description, setDescription] = useState("");
-    const [image, setImage] = useState(null);
+    const handleShow = () => {
+        setTopicName(topic_name);
+        setDescription(description);
+        setImage(image);
+        setLevel(level);
+        setShow(true);
+    }
 
-    const handleShow = () => setShow(true);
-    const handleClose = () => setShow(false);
+    const handleCancle = () => {
+        setShow(false)
+    }
 
     const handleSave = async () => {
         setLoading(true);
 
         try {
             const formData = new FormData();
-            formData.append("topic_name", topicName);
-            formData.append("description", description);
-            formData.append("image", image);
-            formData.append("level", level);
+            formData.append("topic_name", newTopicName);
+            formData.append("description", newDescription);
+            formData.append("image", newImage);
+            formData.append("level", newLevel);
 
-            await uploadTopic(formData);
-
-            notification.success({
-                message: "Tạo topic thành công",
-                duration: 2,
-            });
+            await editTopic(topic_id, formData);
 
             setShow(false);
-
-            setTopicName("");
-            setDescription("");
-            setImage(null);
-            setLevel("");
-
-            onAddTopic();
-        } catch (error) {
-            console.error("Lỗi khi tạo khóa học", error);
-        } finally {
-            setLoading(false);
         }
-    };
-
+        catch (error) {
+            console.error("Không thể sửa khóa học ", error);
+        }
+        setLoading(false);
+        setShow(false);
+    }
 
     return (
         <>
-            <Button type="primary" onClick={handleShow}>
-                Đăng tải khóa học
-            </Button>
-
+            <Button type="primary" onClick={handleShow}>Sửa</Button>
             <Modal
-                open={show}
-                onCancel={handleClose}
+                open={isShow}
+                onCancel={handleCancle}
                 onOk={handleSave}
-                confirmLoading={loading}
+                confirmLoading={isLoading}
                 title="Thêm Chủ Đề"
-                centered
-            >
+                centered>
                 <Form layout="vertical">
                     <Form.Item
                         label="Tên chủ đề"
                         required
                     >
                         <Input
-                            value={topicName}
+                            value={newTopicName}
                             onChange={(e) => setTopicName(e.target.value)}
                             placeholder="Nhập tên chủ đề..."
                         />
@@ -82,7 +73,7 @@ const UploadTopicButton = ({ onAddTopic }) => {
                         required
                     >
                         <Input
-                            value={description}
+                            value={newDescription}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Nhập mô tả..."
                         />
@@ -102,7 +93,7 @@ const UploadTopicButton = ({ onAddTopic }) => {
                         >
                             <Button icon={<UploadOutlined />}>Chọn file hình ảnh</Button>
                         </Upload>
-                        {image && <p>{image.name}</p>}
+                        {newImage && <p>{newImage.name}</p>}
                     </Form.Item>
 
                     <Form.Item
@@ -110,7 +101,7 @@ const UploadTopicButton = ({ onAddTopic }) => {
                         required
                     >
                         <Select
-                            value={level}
+                            value={newLevel}
                             onChange={(value) => setLevel(value)}
                             placeholder="Chọn cấp độ"
                         >
@@ -122,7 +113,7 @@ const UploadTopicButton = ({ onAddTopic }) => {
                 </Form>
             </Modal>
         </>
-    );
-};
+    )
+}
 
-export default UploadTopicButton;
+export default EditTopicButton

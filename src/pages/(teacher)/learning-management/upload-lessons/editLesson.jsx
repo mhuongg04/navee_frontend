@@ -1,86 +1,64 @@
-import React, { useState, useEffect } from "react";
-import uploadLesson from "./api/uploadLesson.api";
-import { Button, Modal, Input, Form, notification, Select, Upload } from "antd";
+import React, { useState } from "react";
+import { Button, Modal, Input, Form, notification, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { AxiosError } from "axios";
-import { getAllTopics } from "../../../learn/api/getAllTopics.api";
+// import { getAllTopics } from "../../../learn/api/getAllTopics.api";
+import editingLesson from "./api/editLesson.api";
 
 
-const { Option } = Select;
-
-//Đăng tải bài học cho khóa học
-const UploadLessonButton = () => {
+//Chỉnh sửa bài học cho khóa học
+const EditLessonButton = ({ lesson_id, title, description, part, des_prac }) => {
     const [show, setShow] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [part, setPart] = useState("");
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [newPart, setPart] = useState(part);
+    const [newTitle, setTitle] = useState(title);
+    const [newDescription, setDescription] = useState(description);
     const [image, setImage] = useState(null);
     const [mp3, setMp3] = useState(null);
     const [mp3Prac, setMp3Prac] = useState(null);
-    const [desPrac, setDesPrac] = useState("");
+    const [newDesPrac, setDesPrac] = useState(des_prac);
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
 
-    const [topicId, setTopicId] = useState("");
-    const [topics, setTopics] = useState([]);
-
-    useEffect(() => {
-        const fetchTopics = async () => {
-            try {
-                const { data } = await getAllTopics();
-                setTopics(data);
-            } catch (error) {
-                console.error("Lỗi khi lấy danh sách topic:", error);
-            }
-        };
-
-        fetchTopics();
-    }, []);
-
 
     const handleSave = async () => {
-        if (!title || !description || !image || !topicId || !mp3) {
-            notification.warning({ message: "Vui lòng nhập đầy đủ thông tin!" });
-            return;
-        }
 
         setLoading(true);
 
         try {
             const formData = new FormData();
-            formData.append("topic_id", topicId);
-            formData.append("title", title);
-            formData.append("description", description);
-            formData.append("image", image);
-            formData.append("mp3", mp3);
-            formData.append("part", part);
-            formData.append("mp3_prac", mp3Prac);
-            formData.append("des_prac", desPrac);
+            formData.append("title", newTitle);
+            formData.append("description", newDescription);
+            if (image) formData.append("image", image);
+            if (mp3) formData.append("mp3", mp3);
+            formData.append("part", newPart);
+            if (mp3Prac) formData.append("mp3_prac", mp3Prac);
+            formData.append("des_prac", newDesPrac);
+            // console.log("Thông tin sửa", lesson_id, {
+            //     title: formData.get("title"),
+            //     description: formData.get("description"),
+            //     part: formData.get("part"),
+            //     des_prac: formData.get("des_prac"),
+            //     image: formData.get("image"),
+            //     mp3: formData.get("mp3"),
+            //     mp3_prac: formData.get("mp3_prac"),
+            // });
 
             //console.log(formData.get("title"))
-            await uploadLesson(formData);
+            await editingLesson(lesson_id, formData);
 
             notification.success({
-                message: "Tạo bài học thành công",
+                message: "Chỉnh sửa bài học thành công",
                 duration: 2,
             });
 
             setShow(false);
 
-            setTitle("");
-            setDescription("");
-            setImage(null);
-            setTopicId("");
-            setPart("");
-            setMp3(null);
-            setMp3Prac(null);
-            setDesPrac("");
         } catch (error) {
             if (error instanceof AxiosError) {
                 notification.error({
-                    message: "Tạo bài học thất bại",
+                    message: "Chỉnh sửa bài học thất bại",
                     description: error.response?.data?.message || "Lỗi không xác định",
                 });
             }
@@ -93,29 +71,29 @@ const UploadLessonButton = () => {
     return (
         <>
             <Button type="primary" onClick={handleShow}>
-                Đăng tải bài học
+                Sửa
             </Button>
 
             <Modal
-                visible={show}
+                open={show}
                 onCancel={handleClose}
                 onOk={handleSave}
                 confirmLoading={loading}
-                title="Thêm Bài Học"
+                title="Chỉnh sửa Bài học"
                 centered
             >
                 <Form layout="vertical">
                     <Form.Item label="Tên bài học" required>
-                        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nhập tên bài học..." />
+                        <Input value={newTitle} onChange={(e) => setTitle(e.target.value)} placeholder="Nhập tên bài học..." />
                     </Form.Item>
 
                     <Form.Item label="Phần" required>
-                        <Input value={part} onChange={(e) => setPart(e.target.value)} placeholder="Nhập số thứ tự phần..." />
+                        <Input value={newPart} onChange={(e) => setPart(e.target.value)} placeholder="Nhập số thứ tự phần..." />
                     </Form.Item>
 
                     <Form.Item label="Script" required>
                         <Input.TextArea
-                            value={description}
+                            value={newDescription}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Nhập script bài học..."
                             autoSize={{ minRows: 3, maxRows: 6 }}
@@ -137,16 +115,6 @@ const UploadLessonButton = () => {
 
                     </Form.Item>
 
-                    <Form.Item label="Chủ đề" required>
-                        <Select value={topicId} onChange={(value) => setTopicId(value)} placeholder="Chọn chủ đề">
-                            {topics.map((topic) => (
-                                <Option key={topic.id} value={topic.id}>
-                                    {topic.topic_name}
-                                </Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-
                     <Form.Item label="File MP3" required>
                         <Upload
                             beforeUpload={(file) => {
@@ -163,7 +131,7 @@ const UploadLessonButton = () => {
 
                     <Form.Item label="Script" required>
                         <Input.TextArea
-                            value={desPrac}
+                            value={newDesPrac}
                             onChange={(e) => setDesPrac(e.target.value)}
                             placeholder="Nhập sript phần luyện tập..."
                             autoSize={{ minRows: 3, maxRows: 6 }}
@@ -189,4 +157,4 @@ const UploadLessonButton = () => {
     );
 };
 
-export default UploadLessonButton;
+export default EditLessonButton;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getExercise } from "../api/getExercise.api";
 import { useParams, useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../../style/Practice.css";
 
@@ -63,6 +64,22 @@ const Practice = () => {
 
     return (
         <div className="container mt-5">
+            <div
+                className="text-start"
+                onClick={() => navigate(-1)}
+                style={{
+                    cursor: 'pointer',
+                    position: "absolute",
+                    top: 20,
+                    left: 20,
+                    display: "flex",
+                    alignItems: "center",
+                    zIndex: 10,
+                }}
+            >
+                <FaArrowLeft className="mr-2" />
+                <span className='px-3 fs-5'>Trở lại trang học tập</span>
+            </div>
             <div className="card shadow-lg p-4">
                 <h2 className="text-center text-primary fw-bold">🏆 Bài tập 🏆</h2>
 
@@ -107,7 +124,7 @@ const Practice = () => {
                             </div>
                         ))
                     ) : (
-                        <p className="text-center text-warning">⏳ Đang tải bài tập...</p>
+                        <p className="text-center text-warning">Đang tải bài tập...</p>
                     )}
 
                     <button
@@ -115,7 +132,7 @@ const Practice = () => {
                         disabled={isSubmitted}
                         className="btn btn-primary w-100 mt-3 fw-bold"
                     >
-                        🏁 Nộp bài
+                        Nộp bài
                     </button>
                 </form>
 
@@ -124,13 +141,13 @@ const Practice = () => {
                         <h3 className="text-info fw-bold">🎉 Điểm của bạn: {score} 🎉</h3>
                         <div className="d-flex justify-content-center gap-3 mt-3">
                             <button onClick={handleReset} className="btn btn-outline-primary">
-                                🔄 Làm lại
+                                Làm lại
                             </button>
                             <button
                                 onClick={() => navigate(-1)}
                                 className="btn btn-success"
                             >
-                                ⏪ Trở về khóa học
+                                Trở về khóa học
                             </button>
                         </div>
                     </div>

@@ -43,9 +43,9 @@ const Header = () => {
                         <Nav.Link as={Link} to="/learn" className="fs-5 text-dark">
                             Học tập
                         </Nav.Link>
-                        <Nav.Link as={Link} to="/dictionary" className="fs-5 text-dark">
+                        {/* <Nav.Link as={Link} to="/dictionary" className="fs-5 text-dark">
                             Từ điển
-                        </Nav.Link>
+                        </Nav.Link> */}
                         {/* <Nav.Link as={Link} to="/test" className="fs-5 text-dark">
                             Kiểm tra
                         </Nav.Link> */}

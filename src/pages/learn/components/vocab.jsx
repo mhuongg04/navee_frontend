@@ -38,7 +38,16 @@ const LessonVocab = () => {
     }, [lessonId]);
 
     return (
-        <Flex align="center" justify="center" style={{ height: "100vh", backgroundColor: "#f5f5f5", position: "relative" }}>
+        <Flex
+            align="center"
+            justify="center"
+            style={{
+                height: "100vh",
+                backgroundColor: "#f5f5f5",
+                position: "relative",
+                padding: '10px', // Thêm padding để tránh việc các phần tử bị chèn sát vào các cạnh màn hình
+            }}
+        >
             <div
                 className="text-start"
                 onClick={() => navigate(-1, { state: { topic_id } })}
@@ -48,14 +57,16 @@ const LessonVocab = () => {
                     top: 20,
                     left: 20,
                     display: "flex",
-                    alignItems: "center"
+                    alignItems: "center",
+                    zIndex: 10,
                 }}
             >
                 <FaArrowLeft className="mr-2" />
-                <span className='px-3 fs-5'> Trở lại trang học tập</span>
+                <span className='px-3 fs-5'>Trở lại trang học tập</span>
             </div>
+
             <FlashcardComponent flashcardData={vocabData} addFlashcard={true} />
-        </Flex >
+        </Flex>
     )
 }
 

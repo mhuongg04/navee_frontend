@@ -27,8 +27,15 @@ const Course = () => {
                 response = await getLessonByTopicId(topic_id);
                 topic = await getTopicById(topic_id);
 
-                setListLesson(response.data)
-                setCurrentTopic(topic.data)
+                const sortedLessons = response.data.sort((a, b) => {
+                    if (a.part !== b.part) {
+                        return a.part - b.part;
+                    }
+                    return a.title.localeCompare(b.title);
+                });
+
+                setListLesson(sortedLessons);
+                setCurrentTopic(topic.data);
             }
             catch (error) {
                 console.error('Cannot find this topic', error)
@@ -41,7 +48,8 @@ const Course = () => {
         if (topic_id) {
             fetchTopic();
         }
-    }, [topic_id])
+    }, [topic_id]);
+
 
     //Đăng ký khóa học
     const handleEnrollTopic = async (topic_id) => {

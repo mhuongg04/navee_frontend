@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import MasterLayout from '../../../../layouts/MasterLayout/masterlayout';
-import { Button, Modal, Form, Input, Select } from 'antd';
+import { Button, Modal, Form, Input, Select, notification } from 'antd';
 import { adminCreateFlashcard } from '../api/createFlashcard.api';
 import { getAllVocabs } from '../api/uploadVocab.api';
 import { getFlashcard } from '../../../flashcard/api/getFlashcard.api';
+import { deleteFlashcard } from '../../../flashcard/api/deleteFlashcard.api';
 
 const FlashcardManagement = () => {
 
@@ -11,8 +12,9 @@ const FlashcardManagement = () => {
     const [title, setTitle] = useState("");
     const [choosedVocabs, setChoosedVocabs] = useState([]);
     const [vocabList, setVocabList] = useState([]);
-    const [isLoading, setLoading] = useState(false);
+    const [, setLoading] = useState(false);
     const [flashcards, setFlashcardList] = useState([]);
+
 
     const handleOpen = () => {
         setIsOpened(true);
@@ -59,17 +61,36 @@ const FlashcardManagement = () => {
                 title,
                 vocabs: choosedVocabs
             })
+            notification.success({
+                message: "Tạo mới flashcard thành công",
+                duration: 2
+            })
         }
         catch (error) {
             console.error("Không thể lưu flashcard", error);
+            notification.error({
+                message: "Không thể tạo mới flashcard",
+                duration: 2
+            })
         }
         finally {
             setLoading(false);
+        }
+        setIsOpened(false);
+    }
+
+    const handleDeleteFlashcard = async (fc_id) => {
+        try {
+            await deleteFlashcard(fc_id);
+        }
+        catch (error) {
+
         }
     }
 
     return (
         <MasterLayout>
+            <h2>Quản lý flashcard</h2>
             <Button onClick={handleOpen}>Thêm mới Flashcard</Button>
 
             <table border="1" cellPadding="10">
@@ -85,7 +106,7 @@ const FlashcardManagement = () => {
                             <td>{fc.title}</td>
                             <td>
                                 <button>Edit</button>
-                                <button style={{ marginLeft: "10px", color: "red" }}>
+                                <button onClick={() => handleDeleteFlashcard(fc.id)} style={{ marginLeft: "10px", color: "red" }}>
                                     Delete
                                 </button>
                             </td>

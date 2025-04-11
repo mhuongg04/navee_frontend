@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { getAllVocabs } from '../../(teacher)/vocab-management/api/uploadVocab.api';
-import { userCreateFlashcard } from '../api/createFlashcard.api';
-import { Input, Form, Modal, Button, notification, Select } from 'antd';
+import { Input, Form, Modal, notification, Select } from 'antd';
+import editFlashcard from '../api/editFlashcard.api';
 
-const CreateMyFlashcardButton = () => {
-    const [show, setShow] = useState(false);
+const EditMyFlashcardModal = ({ isShow, flashcard_id, curTitle, curVocabs, onClose }) => {
+    const [show, setShow] = useState(isShow);
     const [loading, setLoading] = useState(false);
     const [vocabList, setVocabList] = useState([]);
-    const [title, setTitle] = useState("");
-    const [choosedVocabs, setChoosedVocabs] = useState([]);
+    const [title, setTitle] = useState(curTitle);
+    const [choosedVocabs, setChoosedVocabs] = useState(curVocabs);
 
-    const handleShow = () => setShow(true);
-    const handleClose = () => {
-        setShow(false);
-        setTitle("");
-        setChoosedVocabs([]);
-        setLoading(false);
+    useEffect(() => {
+        console.log("Current vocabs: ", curVocabs);
+        setTitle(curTitle);
+        setChoosedVocabs(curVocabs.map((vocab) => vocab.id));
+    }, [curTitle, curVocabs]);
+
+    const handleClose = (e) => {
+        e.stopPropagation();
+        onClose();
     }
 
     useEffect(() => {
@@ -33,68 +36,68 @@ const CreateMyFlashcardButton = () => {
 
     }, []);
 
-    // const toggleVocabSelection = (vocabId) => {
+    useEffect(() => {
+        console.log("Current vocabs: ", curVocabs);
+        setTitle(curTitle);
+        setChoosedVocabs(curVocabs.map((vocab) => vocab.id)); // Lưu id từ vựng đã chọn
+    }, [curTitle, curVocabs]);
+
+    useEffect(() => {
+        setShow(isShow);
+    }, [isShow]);
+
+    // const toggleVocabSelection = (vocabId, e) => {
+    //     e.stopPropagation();
     //     setChoosedVocabs((prev) =>
     //         prev.includes(vocabId) ? prev.filter((id) => id !== vocabId) : [...prev, vocabId]
     //     );
     // };
 
-
-    const handleSave = async () => {
-        if (!title.trim() || choosedVocabs.length === 0) {
-            alert("Vui lòng nhập tiêu đề và chọn ít nhất một từ vựng.");
-            return;
-        }
-
-        setLoading(true);
-        try {
-            await userCreateFlashcard({
-                title,
-                vocabs: choosedVocabs
-            })
-            notification.success({
-                message: "Tạo flashcard thành công",
-                duration: 2
-            })
-            handleClose();
-        } catch (error) {
-            console.error("Lỗi khi tạo flashcard", error);
-            notification.error({
-                message: "Tạo flashcard thất bại",
-                duration: 2
-            })
-        } finally {
-            setLoading(false);
-        }
+    const handleTitleChange = (e) => {
+        e.stopPropagation();
+        setTitle(e.target.value);
     };
+
+    const handleSaveEditFlashcard = async (e) => {
+        setLoading(true);
+        e.stopPropagation();
+        try {
+            await editFlashcard(flashcard_id, title, { data: choosedVocabs });
+
+            notification.success({
+                message: "Sửa flashcard thành công!",
+                duration: 2
+            });
+        }
+        catch (error) {
+            notification.error({
+                message: "Không thể sửa flashcard",
+                duration: 2
+            })
+        }
+        finally {
+            setLoading(false);
+            handleClose(e);
+        }
+    }
 
     return (
         <>
-            <Button
-                size="large"
-                style={{
-                    fontSize: "20px",
-                }}
-                className="rounded-3"
-                type='primary'
-                onClick={handleShow}
-            >
-                + Tạo Flashcard
-            </Button>
-
             <Modal
                 open={show}
                 onCancel={handleClose}
-                onOk={handleSave}
+                onOk={(e) => handleSaveEditFlashcard(e)}
+                modalRender={(dom) => <div onClick={(e) => e.stopPropagation()}>{dom}</div>}
                 confirmLoading={loading}
-                title="Tạo Flashcard của tôi"
+                title="Sửa Flashcard"
                 centered
                 width={800}>
                 <Form layout="vertical">
-                    <Form.Item lable="Tên Flashcard" required>
+                    <Form.Item label="Tên Flashcard" required>
                         <Input
                             value={title}
-                            onChange={(e) => setTitle(e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={handleTitleChange}
                             placeholder="Nhập tiêu đề..."
                         />
                     </Form.Item>
@@ -106,6 +109,7 @@ const CreateMyFlashcardButton = () => {
                                 label: vocab.english,
                                 value: vocab.id
                             }))}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={setChoosedVocabs}>
                         </Select>
                     </Form.Item>
@@ -115,4 +119,4 @@ const CreateMyFlashcardButton = () => {
     )
 }
 
-export default CreateMyFlashcardButton
+export default EditMyFlashcardModal

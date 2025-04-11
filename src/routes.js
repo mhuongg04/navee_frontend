@@ -1,7 +1,7 @@
 import Dashboard from "./pages/homepage/index.js";
 import Profile from "./pages/profile/index.js";
 //import Test from "./pages/test/index.js";
-import Dictionary from "./pages/dictionary/index.js";
+// import Dictionary from "./pages/dictionary/index.js";
 import Learn from "./pages/learn/index.js";
 import Lesson from "./pages/learn/components/lesson.jsx";
 import Login from "./pages/(auth)/sign-in/index.js";
@@ -16,7 +16,6 @@ import UploadLearningMaterial from "./pages/(teacher)/learning-management/upload
 import UploadLessons from "./pages/(teacher)/learning-management/upload-lessons/index.jsx";
 import UploadExercises from "./pages/(teacher)/learning-management/upload-exercises/index.jsx";
 import Flashcard from "./pages/flashcard/index.js";
-import DictionaryManagement from "./pages/(teacher)/vocab-management/index.js";
 import VocabManagement from "./pages/(teacher)/vocab-management/components/vocab-manage.jsx";
 import FlashcardViewer from "./pages/flashcard/components/flashcardViewer.js";
 import LessonVocab from "./pages/learn/components/vocab.jsx";
@@ -48,12 +47,12 @@ const renderUserRouter = () => {
             isProtected: true,
 
         },
-        {
-            path: 'dictionary',
-            element: <Dictionary />,
-            isProtected: true,
+        // {
+        //     path: 'dictionary',
+        //     element: <Dictionary />,
+        //     isProtected: true,
 
-        },
+        // },
         {
             path: 'learn',
             element: <Learn />,
@@ -125,12 +124,6 @@ const renderUserRouter = () => {
         {
             path: '/manage-exercise',
             element: <UploadExercises />,
-            isProtected: true,
-            isAdmin: true,
-        },
-        {
-            path: '/manage-dictionary',
-            element: <DictionaryManagement />,
             isProtected: true,
             isAdmin: true,
         },

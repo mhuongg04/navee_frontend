@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { getLessonByTopicId } from "../../../learn/api/getAllLesson.api";
+import { getLessonById } from "../../../../utils/api/findNameById.api";
 import { getAllTopics } from "../../../learn/api/getAllTopics.api";
 import { uploadVocab, getAllVocabs } from "../api/uploadVocab.api";
 import MasterLayout from "../../../../layouts/MasterLayout/masterlayout";
-import { Button, Form, Modal, Select, Upload, Input } from "antd";
+import { Button, Form, Modal, Select, Upload, Input, notification } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import EditVocabButton from "./editingVocab";
+import deleteVocabulary from "../api/deleteVocab.api";
 
 const { Option } = Select;
 
@@ -17,6 +20,9 @@ const VocabManagement = () => {
     const [topics, setTopics] = useState([]);
     const [vocabList, setVocabList] = useState([]);
     const [vocabs, setVocabs] = useState([]);
+    const [lessonTitles, setLessonTitles] = useState([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
@@ -31,21 +37,45 @@ const VocabManagement = () => {
         const fetchVocabs = async () => {
             try {
                 const { data } = await getAllVocabs();
-                console.log(data);
                 if (!data || data.length === 0) {
-                    console.warn("Không tìm thấy từ vựng.");
                     setVocabs([]);
-                    return
+                    return;
                 }
-                setVocabs(data.data);
+                const sortedVocabs = data.data.sort(
+                    (a, b) => new Date(a.created_at) - new Date(b.created_at)
+                );
+
+                setVocabs(sortedVocabs);
+
+                //console.log("Danh sách từ vựng: ", data.data);
+
+
+                //Lấy tên bài học tương ứng với từ vựng
+                const lessonIds = [...new Set(sortedVocabs.map(vocab => vocab.lesson_id))];
+
+                //console.log(lessonIds)
+                const lessonsOfVocabs = await Promise.all(
+                    lessonIds
+                        .filter(id => !!id)
+                        .map(async id => {
+                            const res = await getLessonById(id);
+                            return { id, title: res.data };
+                        })
+                );
+
+                const titleMap = {};
+                lessonsOfVocabs.forEach(lesson => {
+                    titleMap[lesson.id] = lesson.title;
+                });
+
+                setLessonTitles(titleMap);
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách từ vựng", error);
             }
         };
 
-        //console.log(vocabs);
         fetchVocabs();
-    }, vocabs);
+    }, [refreshKey, vocabs]);
 
 
     // Fetch danh sách chủ đề
@@ -139,15 +169,27 @@ const VocabManagement = () => {
             });
 
             await uploadVocab(formData);
-            alert("Lưu từ vựng thành công!");
+            notification.success({
+                message: "Tạo mới từ vựng thành công",
+                duration: 2
+            })
 
             handleClose();
         } catch (error) {
-            console.error("Lỗi khi lưu từ vựng", error);
+            notification.error({
+                message: "Tạo mới từ vựng thất bại. Hãy thử lại",
+                duration: 2
+            })
         } finally {
             setLoading(false);
+            setRefreshKey(prev => prev + 1);
         }
     };
+
+    //Xóa từ vựng khỏi danh sách
+    const deleteVocab = async (vocab_id) => {
+        await deleteVocabulary(vocab_id);
+    }
 
 
     return (
@@ -155,31 +197,36 @@ const VocabManagement = () => {
             <h2>Quản lý từ vựng</h2>
             <Button type="primary" onClick={handleShow}>Thêm từ vựng</Button>
 
-            <table border="1" cellPadding="10">
-                <thead>
-                    <tr>
-                        <th>Từ</th>
-                        <th>Dịch nghĩa</th>
-                        <th>Loại từ</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {vocabs?.map((vocab) => (
-                        <tr key={vocab.id}>
-                            <td>{vocab.english}</td>
-                            <td>{vocab.vietnamese}</td>
-                            <td>{vocab.category}</td>
-                            <td>
-                                <button>Edit</button>
-                                <button style={{ marginLeft: "10px", color: "red" }}>
-                                    Delete
-                                </button>
-                            </td>
+            <div className="max-h-[800px] overflow-y-auto mt-4 border border-gray-300 rounded">
+                <table className="mt-4 w-full border border-gray-300 text-left">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="p-3 border">Từ</th>
+                            <th className="p-3 border">Dịch nghĩa</th>
+                            <th className="p-3 border">Loại từ</th>
+                            <th className="p-3 border">Mô tả</th>
+                            <th className="p-3 border">Bài học</th>
+                            <th className="p-3 border text-center">Hành động</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {vocabs?.map((vocab) => (
+                            <tr key={vocab.id} className="hover:bg-gray-50">
+                                <td className="p-3 border">{vocab.english}</td>
+                                <td className="p-3 border">{vocab.vietnamese}</td>
+                                <td className="p-3 border">{vocab.category}</td>
+                                <td className="p-3 border">{vocab.description}</td>
+                                <td className="p-3 border">{lessonTitles[vocab.lesson_id] || vocab.lesson_id}</td>
+                                <td className="p-3 border text-center">
+                                    <EditVocabButton vocab_id={vocab.id} english={vocab.english} vietnamese={vocab.vietnamese} description={vocab.description} />
+                                    <Button type="primary" danger className="ms-2" onClick={() => deleteVocab(vocab.id)}>Xóa</Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
 
             <Modal
                 open={show}
