@@ -20,6 +20,7 @@ const UploadLearningMaterial = lazy(() => import("./pages/(teacher)/learning-man
 const UploadLessons = lazy(() => import("./pages/(teacher)/learning-management/upload-lessons/index.jsx"));
 const UploadExercises = lazy(() => import("./pages/(teacher)/learning-management/upload-exercises/index.jsx"));
 const DetailsMyCourse = lazy(() => import('./pages/mycourse/components/detailsMyCourse'));
+const TestPage = lazy(() => import('./pages/learn/components/TestPage'));
 
 const renderUserRouter = () => {
     const userRouters = [
@@ -111,6 +112,11 @@ const renderUserRouter = () => {
         {
             path: '/dashboard/:topic_id',
             element: <DetailsMyCourse />,
+            isProtected: true,
+        },
+        {
+            path: '/test/:testId',
+            element: <TestPage />,
             isProtected: true,
         },
     ]

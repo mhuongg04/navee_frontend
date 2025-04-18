@@ -1,16 +1,21 @@
 import MasterLayout from "../../../layouts/MasterLayout/masterlayout"
-import { useNavigate, useParams } from 'react-router-dom';
-import { List, Card, Row, Col, Progress, Button, Spin } from 'antd';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { List, Card, Row, Col, Progress, Button, Spin, Divider, Badge, message } from 'antd';
 import 'antd/dist/reset.css';
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from 'react-icons/fa';
+import { FormOutlined, CheckCircleOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
 import { getLessonByTopicId } from '../../learn/api/getAllLesson.api'
 import { getTopicById } from "../../learn/api/getAllTopics.api";
 import { getEnrolledTopicById } from "../api/fetchEnrolledTopics.api";
 import { getUserPoints } from "../../user/api/userPoints.api";
+import testApi from "../../learn/api/testApi.api";
+// Import CSS
+import '../../../styles/TestStyles.css';
 
 const DetailsMyCourse = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [listLesson, setListLesson] = useState([]);
     const [error, setError] = useState(null);
     const { topic_id } = useParams();
@@ -20,18 +25,20 @@ const DetailsMyCourse = () => {
     const [progress, setProgress] = useState(0); // Track user progress
     const [enrollment, setEnrollment] = useState(null);
     const [userPoints, setUserPoints] = useState(0);
+    const [topicTests, setTopicTests] = useState([]);
 
     // Thêm state để theo dõi khi nào cần làm mới dữ liệu
     const [lastRefreshed, setLastRefreshed] = useState(Date.now());
 
     console.log("DetailsMyCourse rendering with topic_id:", topic_id);
 
-    // Cập nhật useEffect để làm mới hoàn toàn dữ liệu khi topic_id thay đổi
+    // Cập nhật useEffect để lấy thêm dữ liệu bài kiểm tra
     useEffect(() => {
         // Reset dữ liệu tiến độ khi topic_id thay đổi
         setProgress(0);
         setEnrollment(null);
         setListLesson([]);
+        setTopicTests([]);
         
         const fetchTopic = async (topic_id) => {
             console.log("Fetching topic with ID:", topic_id);
@@ -46,6 +53,12 @@ const DetailsMyCourse = () => {
                 enrollmentData = await getEnrolledTopicById(topic_id);
                 // Lấy thông tin điểm của người dùng
                 const pointsData = await getUserPoints();
+                // Lấy danh sách bài kiểm tra
+                const testsResponse = await testApi.getTestsByUnit(topic_id);
+                
+                // Process test data
+                const testsData = testsResponse.data || [];
+                setTopicTests(testsData);
                 
                 console.log("API responses for topic_id", topic_id, ":", response, topic, enrollmentData);
                 
@@ -99,11 +112,37 @@ const DetailsMyCourse = () => {
         console.log("Refreshing progress for topic:", topic_id);
         setLoading(true);
         try {
-            // Lấy thông tin khóa học đã đăng ký mới nhất - làm theo index.js
+            // Lấy thông tin khóa học đã đăng ký mới nhất
             const enrollmentData = await getEnrolledTopicById(topic_id);
             // Lấy thông tin điểm của người dùng
             const pointsData = await getUserPoints();
+            // Lấy danh sách bài kiểm tra cập nhật
+            const testsResponse = await testApi.getTestsByUnit(topic_id);
             
+            // Hiển thị rõ hơn về dữ liệu API trả về
+            console.log("Tests data received in detail:", testsResponse);
+            
+            const testsData = testsResponse.data || [];
+            
+            // Kiểm tra xem dữ liệu bài kiểm tra có đúng định dạng không
+            console.log("Final tests data to display:", testsData);
+            
+            if (testsData.length === 0) {
+                console.warn("No test data received from API!");
+            }
+            
+            // Kiểm tra từng bài kiểm tra
+            testsData.forEach(test => {
+                console.log(`Test ${test.id} details:`, {
+                    title: test.title,
+                    isCompleted: test.isCompleted,
+                    score: test.score,
+                    totalScore: test.totalScore
+                });
+            });
+            
+            
+            setTopicTests(testsData);
             setUserPoints(pointsData.earnpoints || 0);
             
             // Cập nhật logic giống với index.js
@@ -146,6 +185,17 @@ const DetailsMyCourse = () => {
         }
     };
 
+    // Kiểm tra nếu người dùng đã hoàn thành bài kiểm tra khi quay lại trang
+    useEffect(() => {
+        // Kiểm tra có thông tin từ page test quay về không
+        if (location.state && location.state.testCompleted) {
+            console.log("Test completed, refreshing progress...");
+            refreshProgress();
+            // Reset state để không cập nhật liên tục
+            navigate(location.pathname, { state: {} }, { replace: true });
+        }
+    }, [location]);
+
     // Thêm effect để kiểm tra cập nhật khi component được mount hoặc focus lại
     useEffect(() => {
         // Thêm event listener để cập nhật tiến độ khi tab được focus lại
@@ -181,16 +231,45 @@ const DetailsMyCourse = () => {
         // Kiểm tra xem có cần cập nhật tiến độ không
         const needUpdate = localStorage.getItem('need_progress_update');
         const lastCompletedTopic = localStorage.getItem('last_completed_topic');
+        const testCompleted = localStorage.getItem('test_completed');
+        const lastTestId = localStorage.getItem('last_completed_test');
+        const lastTestScore = localStorage.getItem('last_test_score');
+        const lastTestTotalPoints = localStorage.getItem('last_test_total_points');
         
-        if (needUpdate === 'true' && lastCompletedTopic === topic_id) {
-            console.log("Auto updating progress after completing exercises...");
+        if ((needUpdate === 'true' && lastCompletedTopic === topic_id) || testCompleted === 'true') {
+            console.log("Auto updating progress after completing exercises or test...");
+            
+            // Nếu test mới vừa hoàn thành, hiển thị thông báo
+            if (testCompleted === 'true') {
+                // Giữ lại phần cập nhật điểm số trong state
+                if (lastTestId && lastTestScore) {
+                    // Tìm và cập nhật điểm số cho bài kiểm tra đã hoàn thành
+                    setTopicTests(prevTests => prevTests.map(test => {
+                        if (test.id === lastTestId) {
+                            return {
+                                ...test, 
+                                isCompleted: true,
+                                score: Number(lastTestScore),
+                                totalScore: Number(lastTestTotalPoints || 10)
+                            };
+                        }
+                        return test;
+                    }));
+                    console.log(`Manually updated test ${lastTestId} with score ${lastTestScore}/${lastTestTotalPoints || 10}`);
+                }
+            }
+            
             refreshProgress();
             
             // Xóa flag để không cập nhật liên tục
             localStorage.removeItem('need_progress_update');
             localStorage.removeItem('last_completed_topic');
+            localStorage.removeItem('test_completed');
+            localStorage.removeItem('last_completed_test');
+            localStorage.removeItem('last_test_score');
+            localStorage.removeItem('last_test_total_points');
         }
-    }, [topic_id]); // Chạy khi topic_id thay đổi hoặc component mount
+    }, [topic_id]);
 
     if (loading) {
         return (
@@ -242,21 +321,148 @@ const DetailsMyCourse = () => {
                         className="mt-4 text-start border rounded py-2 px-3"
                         itemLayout="horizontal"
                         dataSource={listLesson}
-                        renderItem={(lesson) => (
-                            <List.Item onClick={() => navigate(`/lesson/${lesson.id}`, { state: { topic_id } })}>
-                                <List.Item.Meta
-                                    title={
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <a className="text-dark font-weight-semibold text-decoration-none" style={{ fontSize: '1.1rem' }}>
-                                                {lesson.title}
-                                            </a>
-                                            <FaArrowRight className="text-muted" />
-                                        </div>
-                                    }
-                                />
-                            </List.Item>
-                        )}
+                        renderItem={(lesson) => {
+                            // Kiểm tra xem bài học đã hoàn thành chưa
+                            const isLessonCompleted = enrollment && 
+                                enrollment.lessonProgress && 
+                                enrollment.lessonProgress.find(progress => 
+                                    progress.lesson_id === lesson.id && progress.completed
+                                );
+                            
+                            return (
+                                <List.Item 
+                                    onClick={isLessonCompleted ? undefined : () => navigate(`/lesson/${lesson.id}`, { state: { topic_id } })}
+                                    style={{ 
+                                        backgroundColor: isLessonCompleted ? '#f6ffed' : 'white',
+                                        transition: 'all 0.3s ease',
+                                        padding: '12px',
+                                        cursor: isLessonCompleted ? 'default' : 'pointer'
+                                    }}
+                                    className={isLessonCompleted ? 'lesson-completed-item' : 'hover:bg-gray-50'}
+                                >
+                                    <List.Item.Meta
+                                        avatar={isLessonCompleted ? 
+                                            <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '24px' }} /> : 
+                                            null
+                                        }
+                                        title={
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div className="d-flex align-items-center">
+                                                    <span className="text-dark font-weight-semibold" style={{ fontSize: '1.1rem' }}>
+                                                        {lesson.title}
+                                                    </span>
+                                                    {isLessonCompleted && (
+                                                        <Badge 
+                                                            style={{ 
+                                                                backgroundColor: '#52c41a', 
+                                                                fontSize: '0.8rem', 
+                                                                marginLeft: '8px' 
+                                                            }}
+                                                            count="Đã hoàn thành"
+                                                        />
+                                                    )}
+                                                </div>
+                                                {!isLessonCompleted && <FaArrowRight className="text-muted" />}
+                                            </div>
+                                        }
+                                    />
+                                </List.Item>
+                            );
+                        }}
                     />
+                    
+                    {/* Phần hiển thị bài kiểm tra */}
+                    {topicTests && topicTests.length > 0 && (
+                        <div className="mt-5">
+                            <Divider />
+                            <h2 className="text-2xl font-semibold text-start" style={{ color: '#093673' }}>
+                                <FormOutlined className="mr-2" /> BÀI KIỂM TRA
+                            </h2>
+                            <p className="text-muted text-start">Kiểm tra kiến thức sau khi học xong các bài học</p>
+                            
+                            <List
+                                className="mt-4 text-start border rounded py-2 px-3"
+                                itemLayout="horizontal"
+                                dataSource={topicTests}
+                                renderItem={(test) => (
+                                    <List.Item 
+                                        onClick={test.isCompleted ? undefined : () => navigate(`/test/${test.id}`, { state: { topic_id } })}
+                                        style={{ 
+                                            backgroundColor: test.isCompleted ? '#f6ffed' : 'white',
+                                            transition: 'all 0.3s ease',
+                                            padding: '12px',
+                                            cursor: test.isCompleted ? 'default' : 'pointer'
+                                        }}
+                                        className={`${test.isCompleted ? 'test-completed-item' : 'hover:bg-gray-50'}`}
+                                    >
+                                        <List.Item.Meta
+                                            avatar={test.isCompleted ? 
+                                                <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '28px' }} /> : 
+                                                <FormOutlined style={{ color: '#1890ff', fontSize: '28px' }} />
+                                            }
+                                            title={
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    <div style={{ maxWidth: '80%' }}>
+                                                        <div className="d-flex align-items-center">
+                                                            <span className="font-weight-bold" style={{ fontSize: '1.1rem', marginRight: '8px' }}>
+                                                                {test.title}
+                                                            </span>
+                                                            {test.isCompleted && (
+                                                                <Badge 
+                                                                    style={{ 
+                                                                        backgroundColor: '#52c41a', 
+                                                                        fontSize: '0.8rem', 
+                                                                        marginLeft: '8px' 
+                                                                    }}
+                                                                    count="Đã hoàn thành"
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        
+                                                        {test.isCompleted && test.score !== undefined && (
+                                                            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center' }}>
+                                                                <Badge
+                                                                    style={{
+                                                                        background: 'linear-gradient(135deg, #ff7e5f, #ff0000)',
+                                                                        fontSize: '1rem',
+                                                                        fontWeight: 'bold',
+                                                                        color: '#fff',
+                                                                        padding: '4px 12px',
+                                                                        borderRadius: '8px',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                                                                    }}
+                                                                    count={
+                                                                        <span>
+                                                                            <StarFilled style={{ marginRight: '6px', color: '#ffd700', fontSize: '1.2rem' }} />
+                                                                            Điểm: {test.score}/{test.totalScore || 10}
+                                                                        </span>
+                                                                    }
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {!test.isCompleted && <FaArrowRight className="text-muted" />}
+                                                </div>
+                                            }
+                                            description={
+                                                <div>
+                                                    <p>{test.description || "Kiểm tra kiến thức"}</p>
+                                                    <div className="d-flex mt-1">
+                                                        <Badge 
+                                                            count={`${test.exercises?.length || 0} câu hỏi`} 
+                                                            style={{ backgroundColor: '#1890ff' }} 
+                                                        />
+                                                    </div>
+                                                </div>
+                                            }
+                                        />
+                                    </List.Item>
+                                )}
+                            />
+                        </div>
+                    )}
                 </Col>
 
                 {/* Right column: Course progress information */}
@@ -281,11 +487,49 @@ const DetailsMyCourse = () => {
                         
                         {enrollment && enrollment.lessonProgress ? (
                             <p><strong>Bài học đã hoàn thành:</strong> {
-                                // Tính toán giống index.js
                                 enrollment.lessonProgress.filter(lesson => lesson.completed).length
                             } / {enrollment.lessonProgress.length} bài</p>
                         ) : (
                             <p><strong>Bài học đã hoàn thành:</strong> 0 / {listLesson.length} bài</p>
+                        )}
+                        
+                        {/* Hiển thị thông tin bài kiểm tra đã hoàn thành */}
+                        {topicTests && topicTests.length > 0 && (
+                            <div className="mt-3">
+                                <p><strong>Bài kiểm tra:</strong> {topicTests.length} bài</p>
+                                <p><strong>Đã hoàn thành:</strong> {
+                                    topicTests.filter(test => test.isCompleted).length
+                                } / {topicTests.length} bài</p>
+                                
+                                {/* Hiển thị điểm số bài kiểm tra */}
+                                {topicTests.some(test => test.isCompleted) && (
+                                    <div className="mt-3 p-3 bg-light rounded">
+                                        <h5 className="font-weight-bold">Điểm bài kiểm tra:</h5>
+                                        <div className="mt-2">
+                                            {topicTests.filter(test => test.isCompleted).map((test, index) => (
+                                                <div key={test.id} className={index > 0 ? "mt-2" : ""}>
+                                                    <div className="d-flex justify-content-between">
+                                                        <span>{test.title}:</span>
+                                                        <span className="text-primary font-weight-bold">
+                                                            {test.score}/{test.totalScore || '?'}
+                                                        </span>
+                                                    </div>
+                                                    <Progress 
+                                                        percent={test.totalScore ? Math.round((test.score / test.totalScore) * 100) : 0} 
+                                                        size="small"
+                                                        strokeColor={
+                                                            test.totalScore && (test.score / test.totalScore) >= 0.7 ? 
+                                                                "#52c41a" : 
+                                                                (test.score / test.totalScore) >= 0.4 ? 
+                                                                    "#faad14" : "#f5222d"
+                                                        }
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         )}
                         
                         {/* Cập nhật hiển thị nút/thông báo dựa trên giá trị progress */}
@@ -310,4 +554,3 @@ const DetailsMyCourse = () => {
 }
 
 export default DetailsMyCourse;
-
