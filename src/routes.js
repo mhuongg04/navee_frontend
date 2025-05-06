@@ -139,10 +139,22 @@ const renderUserRouter = () => {
             isProtected: true,
             isAdmin: true,
         }
+        },
+        {
+            path: '/dashboard/:topic_id',
+            element: <DetailsMyCourse />,
+            isProtected: true,
+        },
+        {
+            path: '/test/:testId',
+            element: <TestPage />,
+            isProtected: true,
+        },
     ]
 
     return (
-        <Routes>
+        <Suspense fallback={<LoadingSpinner size="lg" />}>
+            <Routes>
             {
                 userRouters.map((item, key) => (
                     <Route
@@ -159,7 +171,9 @@ const renderUserRouter = () => {
                     />
                 ))
             }
-        </Routes>
+            </Routes>
+        </Suspense>
+        
     )
 }
 
