@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Button, Modal, Input, Form, notification, Select, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import uploadTopic from "./api/uploadTopic";
-import { AxiosError } from "axios";
+import uploadTopic from "./api/uploadTopic.api";
 
 const { Option } = Select;
 
 
 //Tạo mới các khóa học
-const UploadTopicButton = () => {
+const UploadTopicButton = ({ onAddTopic }) => {
     const [show, setShow] = useState(false);
     const [loading, setLoading] = useState(false);
     const [level, setLevel] = useState("");
@@ -42,24 +41,15 @@ const UploadTopicButton = () => {
             setDescription("");
             setImage(null);
             setLevel("");
+
+            onAddTopic();
         } catch (error) {
-            if (error instanceof AxiosError) {
-                if (error.response?.status === 400) {
-                    notification.error({
-                        message: 'Tạo topic thất bại',
-                    });
-                } else {
-                    notification.error({
-                        message: 'Tạo topic thất bại',
-                        description: 'Lỗi không xác định',
-                    });
-                }
-                console.error(error);
-            }
+            console.error("Lỗi khi tạo khóa học", error);
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <>
@@ -68,7 +58,7 @@ const UploadTopicButton = () => {
             </Button>
 
             <Modal
-                visible={show}
+                open={show}
                 onCancel={handleClose}
                 onOk={handleSave}
                 confirmLoading={loading}
@@ -124,8 +114,9 @@ const UploadTopicButton = () => {
                             onChange={(value) => setLevel(value)}
                             placeholder="Chọn cấp độ"
                         >
-                            <Option value="starter">Starter</Option>
-                            <Option value="mover">Mover</Option>
+                            <Option value="beginner">Beginner</Option>
+                            <Option value="intermediate">Intermediate</Option>
+                            <Option value="advanced">Advanced</Option>
                         </Select>
                     </Form.Item>
                 </Form>

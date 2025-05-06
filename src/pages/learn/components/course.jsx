@@ -1,6 +1,6 @@
 import MasterLayout from "../../../layouts/MasterLayout/masterlayout"
-import { useNavigate, useParams } from 'react-router-dom';
-import { List, Card, Button, Row, Col, message, Divider, Badge, Progress, Spin } from 'antd';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import { List, Card, Button, Row, Col } from 'antd';
 import 'antd/dist/reset.css';
 import React, { useState, useEffect } from "react";
 import { FaArrowRight } from 'react-icons/fa';
@@ -16,7 +16,6 @@ const Course = () => {
 
     const navigate = useNavigate();
     const [listLesson, setListLesson] = useState([]);
-    const setError = useState(null);
     const { topic_id } = useParams();
 
     const [currentTopic, setCurrentTopic] = useState(null);
@@ -71,8 +70,14 @@ const Course = () => {
                     console.log("Không thể lấy kết quả bài kiểm tra, có thể chưa đăng ký khóa học");
                 }
                 
+                const sortedLessons = response.data.sort((a, b) => {
+                    if (a.part !== b.part) {
+                        return a.part - b.part;
+                    }
+                    return a.title.localeCompare(b.title);
+                });
                 setTopicTests(testsWithResults);
-                setListLesson(lessonResponse.data);
+                setListLesson(sortedLessons);
                 setCurrentTopic(topicResponse.data);
                 setUserPoints(pointsData.earnpoints || 0);
             }
@@ -161,9 +166,15 @@ const Course = () => {
                                 <List.Item.Meta
                                     title={
                                         <div className="d-flex justify-content-between align-items-center">
-                                            <span className="text-dark font-weight-semibold" style={{ fontSize: '1.1rem' }}>
+                                            <Link
+                                                to={`/lesson/${lesson.id}`}
+                                                state={{ topic_id }}
+                                                className="text-dark font-weight-semibold text-decoration-none"
+                                                style={{ fontSize: '1.1rem' }}
+                                            >
                                                 {lesson.title}
-                                            </span>
+                                            </Link>
+                                            <FaArrowRight className="text-muted" />
                                         </div>
                                     }
                                 />

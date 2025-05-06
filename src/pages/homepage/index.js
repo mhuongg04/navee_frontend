@@ -44,11 +44,8 @@ const Dashboard = () => {
                         </Nav>
 
                         <Nav className='ms-auto'>
-                            <Button onClick={() => navigate('/login')} className="me-2" style={{ width: '7rem' }}>
-                                Đăng nhập
-                            </Button>
-                            <Button onClick={() => navigate('/signup')} style={{ width: '7rem' }}>
-                                Đăng ký
+                            <Button onClick={() => navigate('/learn')} className="ms-auto" style={{ width: '12rem', fontSize: '18px' }}>
+                                Đi đến Lớp học
                             </Button>
                         </Nav>
                     </Navbar.Collapse>

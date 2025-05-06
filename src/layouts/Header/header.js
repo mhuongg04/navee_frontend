@@ -1,13 +1,13 @@
 import React from 'react';
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
-import { FaUser } from 'react-icons/fa';
+import { FaUser, FaClone } from 'react-icons/fa';
 import { useAuth } from '../../utils/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import NAVEE_logo from '../../assets/images/logo/NAVEE_logo.png';
 
 const Header = () => {
     const navigate = useNavigate();
-    const { logoutAuth } = useAuth();
+    const { logoutAuth, role } = useAuth();
 
     //Xử lý đăng xuất
     const handleLogout = () => {
@@ -43,19 +43,22 @@ const Header = () => {
                         <Nav.Link as={Link} to="/learn" className="fs-5 text-dark">
                             Học tập
                         </Nav.Link>
-                        <Nav.Link as={Link} to="/dictionary" className="fs-5 text-dark">
+                        {/* <Nav.Link as={Link} to="/dictionary" className="fs-5 text-dark">
                             Từ điển
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/test" className="fs-5 text-dark">
+                        </Nav.Link> */}
+                        {/* <Nav.Link as={Link} to="/test" className="fs-5 text-dark">
                             Kiểm tra
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/management" className="fs-5 text-dark">
+                        </Nav.Link> */}
+                        {role === "teacher" && <Nav.Link as={Link} to="/management" className="fs-5 text-dark">
                             Quản lý
-                        </Nav.Link>
+                        </Nav.Link>}
                     </Nav>
 
                     {/* Dropdown for User */}
                     <Nav>
+                        <Nav.Link description="Flashcard" as={Link} to="/flashcard" className="fs-5 text-dark">
+                            <FaClone size={25} style={{ color: '#093673' }} />
+                        </Nav.Link>
                         <NavDropdown
                             title={<FaUser size={25} style={{ color: '#093673' }} />}
                             id="user-dropdown"

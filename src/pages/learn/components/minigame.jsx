@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getExercise } from "../api/getExercise.api";
+import { FaArrowLeft } from "react-icons/fa";
 import { submitExerciseAnswer, getUserExerciseResults } from "../api/submitExercise.api";
 import { getUserPoints, updateUserPoints } from "../../user/api/userPoints.api";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -9,13 +10,14 @@ import PointsNotification from '../../../components/PointsNotification';
 
 const Practice = () => {
     const navigate = useNavigate();
-    const location = useLocation();
+    // const location = useLocation();
     const { lessonId } = useParams();
     const [exercises, setExercises] = useState([]);
     const [answers, setAnswers] = useState({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [score, setScore] = useState(0);
     const [progress, setProgress] = useState(0);
+
     const [results, setResults] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -162,6 +164,22 @@ const Practice = () => {
 
     return (
         <div className="container mt-5">
+            <div
+                className="text-start"
+                onClick={() => navigate(-1)}
+                style={{
+                    cursor: 'pointer',
+                    position: "absolute",
+                    top: 20,
+                    left: 20,
+                    display: "flex",
+                    alignItems: "center",
+                    zIndex: 10,
+                }}
+            >
+                <FaArrowLeft className="mr-2" />
+                <span className='px-3 fs-5'>Trở lại trang học tập</span>
+            </div>
             <div className="card shadow-lg p-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h2 className="text-primary fw-bold mb-0">🏆 Bài tập 🏆</h2>
@@ -171,7 +189,6 @@ const Practice = () => {
                     </div>
                 </div>
 
-                {/* Thanh tiến trình */}
                 <div className="progress mt-3" style={{ height: "20px" }}>
                     <div
                         className="progress-bar progress-bar-striped progress-bar-animated bg-success"
@@ -235,7 +252,7 @@ const Practice = () => {
                             );
                         })
                     ) : (
-                        <p className="text-center text-warning">⏳ Đang tải bài tập...</p>
+                        <p className="text-center text-warning">Đang tải bài tập...</p>
                     )}
 
                     <button
@@ -243,6 +260,7 @@ const Practice = () => {
                         disabled={isSubmitted || isLoading}
                         className="btn btn-primary w-100 mt-3 fw-bold"
                     >
+
                         {isLoading ? "⏳ Đang xử lý..." : "🏁 Nộp bài"}
                     </button>
                 </form>
@@ -252,13 +270,14 @@ const Practice = () => {
                         <h3 className="text-info fw-bold">🎉 Điểm của bạn: {score} 🎉</h3>
                         <div className="d-flex justify-content-center gap-3 mt-3">
                             <button onClick={handleReset} className="btn btn-outline-primary">
-                                🔄 Làm lại
+                                Làm lại
                             </button>
                             <button
-                                onClick={navigateBackToCourse}
+                                onClick={() => navigate(-1)}
+
                                 className="btn btn-success"
                             >
-                                ⏪ Trở về khóa học
+                                Trở về khóa học
                             </button>
                         </div>
                     </div>

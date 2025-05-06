@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import uploadEx from "./uploadEx.api";
-import { getAllLesson } from "../../../learn/api/getAllLesson.api";
-import { Button, Modal, Input, Form, notification, Select, Space } from "antd";
+import uploadEx from "./api/uploadEx.api";
+import { getAllTopics } from "../../../learn/api/getAllTopics.api";
+import { getLessonByTopicId } from "../../../learn/api/getAllLesson.api";
+
+import { Button, Modal, Input, Form, Select, Space } from "antd";
 
 const { Option } = Select;
 
@@ -12,19 +14,45 @@ const UploadExerciseButton = () => {
     const [exercises, setExercises] = useState([
         { question: "", answer: "", point: "" }
     ]);
+    const [topicId, setTopicId] = useState("");
+    const [topics, setTopics] = useState([]);
+
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const { data } = await getAllTopics();
+                if (!data || data.length === 0) {
+                    console.warn("Không tìm thấy khóa học.");
+                    setTopics([]);
+                    return
+                }
+                setTopics(data);
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách chủ đề", error);
+            }
+        };
+        fetchTopics();
+    }, []);
 
     useEffect(() => {
         const fetchLessons = async () => {
             try {
-                const { data } = await getAllLesson();
-                setLessons(data);
+                const { data } = await getLessonByTopicId(topicId);
+                if (data) {
+                    setLessons(data);
+                }
+                else {
+                    setLessonId("");
+                    setLessons([]);
+                }
+
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách topic:", error);
             }
         };
 
         fetchLessons();
-    }, []);
+    }, [topicId]);
 
     const showModal = () => setIsOpen(!isOpen);
     const handleCancel = () => setIsOpen(false);
@@ -102,6 +130,15 @@ const UploadExerciseButton = () => {
                                 />
                             </Form.Item>
                             <Form.Item label="Chủ đề" required>
+                                <Select value={topicId} onChange={(value) => setTopicId(value)} placeholder="Chọn chủ đề">
+                                    {topics.map((topic) => (
+                                        <Option key={topic.id} value={topic.id}>
+                                            {topic.topic_name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item label="Bài học" required>
                                 <Select value={lessonId} onChange={(value) => setLessonId(value)} placeholder="Chọn bài học">
                                     {lessons.map((lesson) => (
                                         <Option key={lesson.id} value={lesson.id}>

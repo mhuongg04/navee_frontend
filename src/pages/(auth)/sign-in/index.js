@@ -25,7 +25,9 @@ const Login = () => {
         login({ email: value.email, password: value.password })
             .then((data) => {
                 const token = data.accessToken;
-                loginAuth(token);
+                const role = data.role;
+                //console.log("role: ", role);
+                loginAuth(token, role);
                 api.info({
                     message: "Đăng nhập thành công",
                     duration: 2,
@@ -101,7 +103,7 @@ const Login = () => {
                             name="password"
                             rules={[{ required: true, message: "Hãy điền mật khẩu của bạn!" }]}
                         >
-                            <Input placeholder="Điền mật khẩu" />
+                            <Input.Password placeholder="Điền mật khẩu" />
                         </Form.Item>
 
                         {/* Nút Đăng nhập */}

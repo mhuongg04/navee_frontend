@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import uploadLesson from './uploadLesson.api';
+import uploadLesson from "./api/uploadLesson.api";
 import { Button, Modal, Input, Form, notification, Select, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { AxiosError } from "axios";
@@ -17,6 +17,8 @@ const UploadLessonButton = () => {
     const [description, setDescription] = useState("");
     const [image, setImage] = useState(null);
     const [mp3, setMp3] = useState(null);
+    const [mp3Prac, setMp3Prac] = useState(null);
+    const [desPrac, setDesPrac] = useState("");
 
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
@@ -54,6 +56,8 @@ const UploadLessonButton = () => {
             formData.append("image", image);
             formData.append("mp3", mp3);
             formData.append("part", part);
+            formData.append("mp3_prac", mp3Prac);
+            formData.append("des_prac", desPrac);
 
             //console.log(formData.get("title"))
             await uploadLesson(formData);
@@ -71,6 +75,8 @@ const UploadLessonButton = () => {
             setTopicId("");
             setPart("");
             setMp3(null);
+            setMp3Prac(null);
+            setDesPrac("");
         } catch (error) {
             if (error instanceof AxiosError) {
                 notification.error({
@@ -111,7 +117,7 @@ const UploadLessonButton = () => {
                         <Input.TextArea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Nhập mô tả..."
+                            placeholder="Nhập script bài học..."
                             autoSize={{ minRows: 3, maxRows: 6 }}
                         />
                     </Form.Item>
@@ -153,6 +159,29 @@ const UploadLessonButton = () => {
                             <Button icon={<UploadOutlined />}>Chọn file MP3</Button>
                         </Upload>
                         {mp3 && <p>{mp3.name}</p>}
+                    </Form.Item>
+
+                    <Form.Item label="Script" required>
+                        <Input.TextArea
+                            value={desPrac}
+                            onChange={(e) => setDesPrac(e.target.value)}
+                            placeholder="Nhập sript phần luyện tập..."
+                            autoSize={{ minRows: 3, maxRows: 6 }}
+                        />
+                    </Form.Item>
+
+                    <Form.Item label="File MP3 luyện tập" required>
+                        <Upload
+                            beforeUpload={(file) => {
+                                setMp3Prac(file);
+                                return false;
+                            }}
+                            accept="audio/mp3"
+                            showUploadList={false}
+                        >
+                            <Button icon={<UploadOutlined />}>Chọn file MP3</Button>
+                        </Upload>
+                        {mp3Prac && <p>{mp3Prac.name}</p>}
                     </Form.Item>
                 </Form>
             </Modal>
