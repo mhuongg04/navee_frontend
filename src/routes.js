@@ -1,20 +1,26 @@
-import Dashboard from "./pages/homepage/index.js";
-import Profile from "./pages/profile";
-import Test from "./pages/test";
-import Dictionary from "./pages/dictionary";
-import Learn from "./pages/learn";
-import Lesson from "./pages/learn/components/lesson";
-import Login from "./pages/(auth)/sign-in";
-import Signup from "./pages/(auth)/sign-up";
-import Management from "./pages/(teacher)/index";
-import { Route, Routes } from "react-router-dom";
-import Course from "./pages/learn/components/course";
-import Practice from "./pages/learn/components/minigame.jsx";
+import React, { lazy, Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from "./utils/ProtectedRoute.jsx";
-import MyCourse from "./pages/mycourse/index.js";
-import UploadLearningMaterial from "./pages/(teacher)/learning-management/upload-topics/index";
-import UploadLessons from "./pages/(teacher)/learning-management/upload-lessons/index.jsx";
-import UploadExercises from "./pages/(teacher)/learning-management/upload-exercises/index.jsx";
+import LoadingSpinner from "./components/common/LoadingSpinner";
+
+// Lazy load tất cả các trang thay vì import trực tiếp
+const Dashboard = lazy(() => import("./pages/homepage/index.js"));
+const Profile = lazy(() => import("./pages/profile"));
+const Test = lazy(() => import("./pages/test"));
+const Dictionary = lazy(() => import("./pages/dictionary"));
+const Learn = lazy(() => import("./pages/learn"));
+const Lesson = lazy(() => import("./pages/learn/components/lesson"));
+const Login = lazy(() => import("./pages/(auth)/sign-in"));
+const Signup = lazy(() => import("./pages/(auth)/sign-up"));
+const Management = lazy(() => import("./pages/(teacher)/index"));
+const Course = lazy(() => import("./pages/learn/components/course"));
+const Practice = lazy(() => import("./pages/learn/components/minigame.jsx"));
+const MyCourse = lazy(() => import("./pages/mycourse/index.js"));
+const UploadLearningMaterial = lazy(() => import("./pages/(teacher)/learning-management/upload-topics/index"));
+const UploadLessons = lazy(() => import("./pages/(teacher)/learning-management/upload-lessons/index.jsx"));
+const UploadExercises = lazy(() => import("./pages/(teacher)/learning-management/upload-exercises/index.jsx"));
+const DetailsMyCourse = lazy(() => import('./pages/mycourse/components/detailsMyCourse'));
+const TestPage = lazy(() => import('./pages/learn/components/TestPage'));
 
 const renderUserRouter = () => {
     const userRouters = [
@@ -102,11 +108,22 @@ const renderUserRouter = () => {
             path: '/manage-exercise',
             element: <UploadExercises />,
             isProtected: true,
-        }
+        },
+        {
+            path: '/dashboard/:topic_id',
+            element: <DetailsMyCourse />,
+            isProtected: true,
+        },
+        {
+            path: '/test/:testId',
+            element: <TestPage />,
+            isProtected: true,
+        },
     ]
 
     return (
-        <Routes>
+        <Suspense fallback={<LoadingSpinner size="lg" />}>
+            <Routes>
             {
                 userRouters.map((item, key) => (
                     <Route
@@ -122,7 +139,9 @@ const renderUserRouter = () => {
                     />
                 ))
             }
-        </Routes>
+            </Routes>
+        </Suspense>
+        
     )
 }
 

@@ -6,6 +6,7 @@ import traffic1 from '../../assets/images/traffic1.png';
 import logo from '../../assets/images/logo/NAVEE_logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
+import TestList from './components/TestList';
 // const { Container } = require('react-bootstrap');
 // const NavDropdown = require('react-bootstrap/NavDropdown');
 
@@ -152,6 +153,13 @@ const Learn = () => {
           </List.Item>
         )}
       /> */}
+
+      {/* Hiển thị danh sách bài kiểm tra nếu đã đăng ký khóa học */}
+      {/* {isEnrolled && (
+        <div className="test-section mt-5">
+          <TestList topicId={topicId} />
+        </div>
+      )} */}
 
     </MasterLayout >
   )
